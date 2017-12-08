@@ -1,7 +1,5 @@
 package org.scijava.search;
 
-import java.util.List;
-
 /**
  * An object to be notified when a {@link Searcher} completes a search and
  * produces results.
@@ -11,5 +9,5 @@ import java.util.List;
 public interface SearchListener {
 
 	/** TODO */
-	void searchCompleted(Searcher searcher, List<SearchResult> results);
+	void searchCompleted(SearchEvent event);
 }

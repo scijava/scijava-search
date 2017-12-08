@@ -113,7 +113,7 @@ public class DefaultSearchOperation implements SearchOperation {
 			final List<SearchResult> results = searcher.search(query, fuzzy);
 			if (!valid) return;
 			for (final SearchListener l : listeners) {
-				l.searchCompleted(searcher, results);
+				l.searchCompleted(new SearchEvent(searcher, results));
 			}
 		}
 	}

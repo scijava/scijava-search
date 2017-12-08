@@ -41,10 +41,12 @@ import java.awt.event.FocusListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.net.URL;
-import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javax.swing.Box;
@@ -64,7 +66,12 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import org.scijava.Context;
+import org.scijava.Priority;
 import org.scijava.plugin.Parameter;
+import org.scijava.plugin.PluginInfo;
+import org.scijava.plugin.PluginService;
+import org.scijava.plugin.SciJavaPlugin;
+import org.scijava.search.SearchEvent;
 import org.scijava.search.SearchOperation;
 import org.scijava.search.SearchResult;
 import org.scijava.search.SearchService;
@@ -91,6 +98,9 @@ public class SwingSearchBar extends JTextField {
 
 	@Parameter
 	private ThreadService threadService;
+
+	@Parameter
+	private PluginService pluginService;
 
 	private final Window parent;
 	private JDialog dialog;
@@ -164,6 +174,25 @@ public class SwingSearchBar extends JTextField {
 		requestFocus();
 	}
 
+	// -- Utility methods --
+
+	// TODO: Move this method to PluginService.
+	public <PT extends SciJavaPlugin> void sort(final List<PT> instances,
+		final Class<PT> type)
+	{
+		// Create a mapping from plugin classes to priorities.
+		final List<PluginInfo<PT>> plugins = pluginService.getPluginsOfType(type);
+		final Map<Class<?>, PluginInfo<PT>> infos = plugins.stream().collect(//
+			Collectors.toMap(PluginInfo::getPluginClass, Function.identity()));
+
+		// Compare plugin instances by priority via the mapping.
+		final Comparator<PT> comparator = (o1, o2) -> Priority.compare(//
+			infos.get(o1.getClass()), infos.get(o2.getClass()));
+		Collections.sort(instances, comparator);
+	}
+
+	// -- Helper methods --
+
 	/** Called whenever the user types something. */
 	private void search() {
 		if (dialog == null) {
@@ -173,13 +202,7 @@ public class SwingSearchBar extends JTextField {
 			}
 
 			dialog = new JDialog(parent, "Quick Search");
-			searchPanel = new SwingSearchPanel(searchService.search(//
-				(searcher, results) -> {
-					threadService.queue(() -> {
-						searchPanel.update(searcher, results);
-					});
-					// TODO Auto-generated method stub
-				}));
+			searchPanel = new SwingSearchPanel(); // Spawns the SearchOperation!
 			dialog.setContentPane(searchPanel);
 			dialog.pack();
 
@@ -224,12 +247,14 @@ public class SwingSearchBar extends JTextField {
 
 	private class SwingSearchPanel extends JPanel {
 
-private final SearchOperation operation;
-		private final Map<Searcher, List<SearchResult>> allResults;
+		private final SearchOperation operation;
+		private final Map<Class<?>, SearchEvent> allResults;
 		private final JList<SearchResult> resultsList;
 
-		public SwingSearchPanel(final SearchOperation operation) {
-			this.operation = operation;
+		public SwingSearchPanel() {
+			operation = searchService.search(//
+				event -> threadService.queue(() -> searchPanel.update(event)));
+
 			allResults = new HashMap<>();
 			resultsList = new JList<>();
 			resultsList.setCellRenderer((list, value, index, isSelected,
@@ -265,9 +290,8 @@ private final SearchOperation operation;
 			add(splitPane, BorderLayout.CENTER);
 		}
 
-		public void update(Searcher searcher, List<SearchResult> results) {
-			allResults.put(searcher, //
-				results.stream().limit(MAX_RESULTS).collect(Collectors.toList()));
+		public void update(SearchEvent event) {
+			allResults.put(event.searcher().getClass(), event);
 			rebuild();
 		}
 
@@ -291,7 +315,6 @@ private final SearchOperation operation;
 			final int rowCount = resultsList.getModel().getSize();
 			if (rowCount == 0) return;
 			// Move downward in the list one element at a time, skipping headers.
-			// TODO: skip disabled header rows.
 			int index = resultsList.getSelectedIndex();
 			do {
 				index = (index + 1) % rowCount;
@@ -303,9 +326,10 @@ private final SearchOperation operation;
 		// -- Helper methods --
 
 		private void rebuild() {
-			final List<Searcher> searchers = new ArrayList<>(allResults.keySet());
-			// TODO: pluginService.sort(searchers, Searcher.class)
-			// Needs to cross-reference objects against PluginInfos of that type.
+			// Gets list of Searchers, sorted by priority.
+			final List<Searcher> searchers = allResults.values().stream().map(
+				event -> event.searcher()).collect(Collectors.toList());
+			sort(searchers, Searcher.class);
 
 			System.out.println("--------------");
 			DefaultListModel<SearchResult> listModel = new DefaultListModel<>();
@@ -315,11 +339,16 @@ private final SearchOperation operation;
 				listModel.addElement(new SearchResultHeader(searcher.title()));
 
 				// Add results as entries.
-				for (final SearchResult result : allResults.get(searcher)) {
+				for (final SearchResult result : results(searcher)) {
 					listModel.addElement(result);
 				}
 			}
 			resultsList.setModel(listModel);
+		}
+
+		private List<SearchResult> results(final Searcher searcher) {
+			return allResults.get(searcher.getClass()).results().stream().limit(
+				MAX_RESULTS).collect(Collectors.toList());
 		}
 
 		private Component icon(final String iconPath) {

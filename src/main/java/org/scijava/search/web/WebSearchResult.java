@@ -1,9 +1,9 @@
 package org.scijava.search.web;
 
-import org.scijava.search.SearchResult;
-
 import java.util.HashMap;
 import java.util.Map;
+
+import org.scijava.search.SearchResult;
 
 /**
  * This class represents a typical web search result being represented

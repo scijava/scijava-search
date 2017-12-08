@@ -1,19 +1,17 @@
 package org.scijava.search.web;
 
-import org.scijava.module.ModuleService;
-import org.scijava.plugin.Parameter;
+import java.awt.Desktop;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+
+import javax.xml.ws.WebServiceException;
+
 import org.scijava.plugin.Plugin;
 import org.scijava.search.DefaultSearchAction;
 import org.scijava.search.SearchAction;
 import org.scijava.search.SearchActionFactory;
 import org.scijava.search.SearchResult;
-import org.scijava.search.module.ModuleSearchResult;
-
-import javax.xml.ws.WebServiceException;
-import java.awt.*;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 
 /**
  * This factory creates actions for opening web search results in a browser

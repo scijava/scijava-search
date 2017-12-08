@@ -1,23 +1,20 @@
 package org.scijava.search.web;
 
 
-import org.scijava.plugin.Plugin;
-import org.scijava.search.SearchResult;
-import org.scijava.search.Searcher;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.List;
 
-import static ij.IJ.showStatus;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.scijava.search.SearchResult;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 /**
  * Searcher plugin for the Bio Imaging Search Engine  (http://biii.eu/search)

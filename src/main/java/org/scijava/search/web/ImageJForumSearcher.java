@@ -1,14 +1,15 @@
 package org.scijava.search.web;
 
-import org.scijava.plugin.Plugin;
-import org.scijava.search.SearchResult;
-import org.scijava.search.Searcher;
-
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.util.*;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Scanner;
+
+import org.scijava.plugin.Plugin;
+import org.scijava.search.SearchResult;
+import org.scijava.search.Searcher;
 
 
 /**

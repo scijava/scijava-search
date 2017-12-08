@@ -1,9 +1,9 @@
 package org.scijava.search.web;
 
+import java.util.ArrayList;
+
 import org.scijava.search.SearchResult;
 import org.scijava.search.Searcher;
-
-import java.util.ArrayList;
 
 /**
  * The AbstractWebSearcher contains convenience function to manage

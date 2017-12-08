@@ -1,6 +1,7 @@
 
 package org.scijava.search.module;
 
+import org.scijava.Priority;
 import org.scijava.module.ModuleService;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
@@ -14,7 +15,7 @@ import org.scijava.search.SearchResult;
  *
  * @author Curtis Rueden
  */
-@Plugin(type = SearchActionFactory.class)
+@Plugin(type = SearchActionFactory.class, priority = Priority.VERY_HIGH)
 public class RunModuleSearchActionFactory implements SearchActionFactory {
 
 	@Parameter

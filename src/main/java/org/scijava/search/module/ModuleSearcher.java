@@ -35,6 +35,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.scijava.Context;
+import org.scijava.Priority;
+import org.scijava.app.AppService;
 import org.scijava.module.ModuleInfo;
 import org.scijava.module.ModuleService;
 import org.scijava.plugin.Parameter;
@@ -47,7 +49,7 @@ import org.scijava.search.Searcher;
  *
  * @author Curtis Rueden
  */
-@Plugin(type = Searcher.class)
+@Plugin(type = Searcher.class, priority = Priority.VERY_HIGH)
 public class ModuleSearcher implements Searcher {
 
 	@Parameter
@@ -55,6 +57,9 @@ public class ModuleSearcher implements Searcher {
 
 	@Parameter
 	private ModuleService moduleService;
+
+	@Parameter
+	private AppService appService;
 
 	@Override
 	public String title() {
@@ -64,9 +69,12 @@ public class ModuleSearcher implements Searcher {
 
 	@Override
 	public List<SearchResult> search(final String text, final boolean fuzzy) {
-		return moduleService.getModules().stream().filter(info -> 
-			matches(info, text)
-		).map(info -> new ModuleSearchResult(info)).collect(Collectors.toList());
+		final String baseDir = //
+			appService.getApp().getBaseDirectory().getAbsolutePath();
+		return moduleService.getModules().stream() //
+			.filter(info -> matches(info, text)) //
+			.map(info -> new ModuleSearchResult(info, baseDir)) //
+			.collect(Collectors.toList());
 	}
 
 	// -- Helper methods --

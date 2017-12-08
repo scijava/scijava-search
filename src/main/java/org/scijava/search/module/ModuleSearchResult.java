@@ -7,9 +7,8 @@ import java.util.Map;
 
 import org.scijava.MenuEntry;
 import org.scijava.MenuPath;
-import org.scijava.app.AppService;
+import org.scijava.input.Accelerator;
 import org.scijava.module.ModuleInfo;
-import org.scijava.plugin.Parameter;
 import org.scijava.search.SearchResult;
 import org.scijava.util.ClassUtils;
 import org.scijava.util.FileUtils;
@@ -21,14 +20,13 @@ import org.scijava.util.FileUtils;
  */
 public class ModuleSearchResult implements SearchResult {
 
-	@Parameter
-	private AppService appService;
-
 	private final ModuleInfo info;
+	private final String baseDir;
 	private HashMap<String, String> props;
 
-	public ModuleSearchResult(final ModuleInfo info) {
+	public ModuleSearchResult(final ModuleInfo info, final String baseDir) {
 		this.info = info;
+		this.baseDir = baseDir;
 
 		props = new HashMap<>();
 		props.put("Hello", "World");
@@ -38,7 +36,10 @@ public class ModuleSearchResult implements SearchResult {
 			props.put("Menu path", menuPath.getMenuString(false));
 			final MenuEntry menuLeaf = menuPath.getLeaf();
 			if (menuLeaf != null) {
-				props.put("Shortcut", menuLeaf.getAccelerator().toString());
+				final Accelerator accelerator = menuLeaf.getAccelerator();
+				if (accelerator != null) {
+					props.put("Shortcut", accelerator.toString());
+				}
 			}
 		}
 		props.put("Identifier", info.getIdentifier());
@@ -72,8 +73,6 @@ public class ModuleSearchResult implements SearchResult {
 		if (file == null) return null;
 		final String path = file.getAbsolutePath();
 		if (path == null) return null;
-		final String baseDir = //
-			appService.getApp().getBaseDirectory().getAbsolutePath();
 		if (path.startsWith(baseDir)) {
 			if (path.length() == baseDir.length()) return "";
 			return path.substring(baseDir.length() + 1);

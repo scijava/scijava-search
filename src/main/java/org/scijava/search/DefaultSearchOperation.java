@@ -20,6 +20,9 @@ public class DefaultSearchOperation implements SearchOperation {
 	/** Delay in milliseconds before invoking the searchers. */
 	private static final int DELAY = 200;
 
+	private final SearchListener[] listeners;
+	private final List<SearchAttempt> currentSearches = new ArrayList<>();
+
 	@Parameter
 	private PluginService pluginService;
 
@@ -29,15 +32,10 @@ public class DefaultSearchOperation implements SearchOperation {
 	@Parameter
 	private LogService log;
 
-	private SearchListener[] listeners;
-
-	private List<SearchAttempt> currentSearches = new ArrayList<>();
-
 	private boolean active = true;
 
 	private String query;
 	private boolean fuzzy;
-	private long lastSearchTime;
 	private long lastModifyTime;
 
 	public DefaultSearchOperation(final Context context, final SearchListener... callbacks) {
@@ -45,21 +43,25 @@ public class DefaultSearchOperation implements SearchOperation {
 		context.inject(this);
 		threadService.run(() -> {
 			while (active) {
-				if (lastModifyTime - lastSearchTime > DELAY) {
-					// Time to start a new search! Spawn one new thread per searcher.
-					cancelCurrentSearches();
-					for (final Searcher searcher : searchers()) {
-						final SearchAttempt search = new SearchAttempt(searcher);
-						currentSearches.add(search);
-						threadService.run(search);
-					}
-					lastSearchTime = System.currentTimeMillis();
-				}
 				try {
 					Thread.sleep(50);
 				}
 				catch (final InterruptedException exc) {
 					log.error(exc);
+				}
+				if (lastModifyTime == 0) continue; // nothing modified yet!
+				if (System.currentTimeMillis() - lastModifyTime < DELAY) {
+					// Not enough time elapsed since last modification; wait longer.
+					continue;
+				}
+				lastModifyTime = 0;
+
+				// Time to start a new search! Spawn one new thread per searcher.
+				cancelCurrentSearches();
+				for (final Searcher searcher : searchers()) {
+					final SearchAttempt search = new SearchAttempt(searcher);
+					currentSearches.add(search);
+					threadService.run(search);
 				}
 			}
 			cancelCurrentSearches();
@@ -69,13 +71,13 @@ public class DefaultSearchOperation implements SearchOperation {
 	@Override
 	public void setFuzzy(boolean fuzzy) {
 		this.fuzzy = fuzzy;
-		lastModifyTime = System.currentTimeMillis();
+		refreshModifyTime();
 	}
 
 	@Override
 	public void search(final String text) {
 		query = text;
-		lastModifyTime = System.currentTimeMillis();
+		refreshModifyTime();
 	}
 
 	@Override
@@ -94,13 +96,17 @@ public class DefaultSearchOperation implements SearchOperation {
 		currentSearches.clear();
 	}
 
+	private void refreshModifyTime() {
+		lastModifyTime = System.currentTimeMillis();
+	}
+
 	// -- Helper classes  --
 
 	private class SearchAttempt implements Runnable {
 		private Searcher searcher;
 		private boolean valid = true;
 
-		private SearchAttempt(Searcher searcher) {
+		private SearchAttempt(final Searcher searcher) {
 			this.searcher = searcher;
 		}
 

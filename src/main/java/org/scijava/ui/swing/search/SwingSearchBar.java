@@ -357,10 +357,8 @@ public class SwingSearchBar extends JTextField {
 				event -> event.searcher()).collect(Collectors.toList());
 			sort(searchers, Searcher.class);
 
-			System.out.println("--------------");
 			DefaultListModel<SearchResult> listModel = new DefaultListModel<>();
 			for (final Searcher searcher : searchers) {
-				System.out.println("Processing searcher: " + searcher + " (" + searcher.title() + ")");
 				// Add section header.
 				listModel.addElement(new SearchResultHeader(searcher.title()));
 

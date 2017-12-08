@@ -24,7 +24,7 @@ import static ij.IJ.showStatus;
  *
  * @author Robert Haase, http://github.com/haesleinhuepfv
  */
-@Plugin(type = Searcher.class, name = "BISE")
+//@Plugin(type = Searcher.class, name = "BISE")
 public class BISESearcher extends AbstractWebSearcher
 {
 
@@ -109,9 +109,6 @@ public class BISESearcher extends AbstractWebSearcher
     private void parse(Node node) {
         if (node.getNodeName().equals("div")) {
             Node item = node.getAttributes() == null ? null : node.getAttributes().getNamedItem("class");
-            if (item != null) {
-                System.out.println(item.getNodeValue());
-            }
             if (item != null && item.getNodeValue().equals("views-field views-field-title")) {
 
                 if (currentHeading != null) {
@@ -122,7 +119,6 @@ public class BISESearcher extends AbstractWebSearcher
                 return;
             }
             if (item != null && item.getNodeValue().equals("views-field views-field-search-api-excerpt")) {
-                System.out.println(node.getNodeName());
                 parseContent(node);
                 return;
             }

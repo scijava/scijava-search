@@ -9,6 +9,11 @@ import org.scijava.search.SearchActionFactory;
 import org.scijava.search.SearchResult;
 import org.scijava.ui.UIService;
 
+/**
+ * Search action for getting help on a SciJava module.
+ *
+ * @author Curtis Rueden
+ */
 @Plugin(type = SearchActionFactory.class)
 public class HelpModuleSearchActionFactory implements SearchActionFactory {
 

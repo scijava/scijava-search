@@ -1,6 +1,15 @@
 package org.scijava.search.web;
 
 
+import java.io.IOException;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.util.List;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.scijava.plugin.Plugin;
 import org.scijava.search.SearchResult;
 import org.scijava.search.Searcher;
@@ -8,20 +17,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.net.URLEncoder;
-import java.util.*;
-import java.util.List;
 
 /**
  * The Wiki search allows users to find help on http://imagej.net/
@@ -106,9 +101,6 @@ public class WikiSearcher extends AbstractWebSearcher {
     private void parse(Node node) {
         if (node.getNodeName().equals("div")) {
             Node item = node.getAttributes() == null ? null : node.getAttributes().getNamedItem("class");
-            if (item != null) {
-                System.out.println(item.getNodeValue());
-            }
             if (item != null && item.getNodeValue().equals("mw-search-result-heading")) {
 
                 if (currentHeading != null) {
@@ -119,7 +111,6 @@ public class WikiSearcher extends AbstractWebSearcher {
                 return;
             }
             if (item != null && item.getNodeValue().equals("searchresult")) {
-                System.out.println(node.getNodeName());
                 parseContent(node);
                 return;
             }

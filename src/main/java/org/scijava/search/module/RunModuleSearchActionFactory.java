@@ -9,6 +9,11 @@ import org.scijava.search.SearchAction;
 import org.scijava.search.SearchActionFactory;
 import org.scijava.search.SearchResult;
 
+/**
+ * Search action for executing a SciJava module.
+ *
+ * @author Curtis Rueden
+ */
 @Plugin(type = SearchActionFactory.class)
 public class RunModuleSearchActionFactory implements SearchActionFactory {
 

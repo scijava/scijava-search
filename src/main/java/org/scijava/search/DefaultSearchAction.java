@@ -1,6 +1,11 @@
 
 package org.scijava.search;
 
+/**
+ * Default implementation of {@link SearchAction}.
+ *
+ * @author Curtis Rueden
+ */
 public class DefaultSearchAction implements SearchAction {
 
 	private final String label;

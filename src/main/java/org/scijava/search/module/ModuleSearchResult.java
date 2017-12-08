@@ -14,6 +14,11 @@ import org.scijava.search.SearchResult;
 import org.scijava.util.ClassUtils;
 import org.scijava.util.FileUtils;
 
+/**
+ * Search result for the {@link ModuleSearcher}.
+ *
+ * @author Curtis Rueden
+ */
 public class ModuleSearchResult implements SearchResult {
 
 	@Parameter
@@ -38,12 +43,6 @@ public class ModuleSearchResult implements SearchResult {
 		}
 		props.put("Identifier", info.getIdentifier());
 		props.put("Location", getLocation());
-
-//		actions = new ArrayList<>();
-//		actions.add(new SearchAction("Run", this::run)); 
-//		actions.add(new SearchAction("Batch", this::batch)); 
-//		actions.add(new SearchAction("Source", this::source)); 
-//		actions.add(new SearchAction("Help", this::help)); 
 	}
 
 	public ModuleInfo info() { return info; }

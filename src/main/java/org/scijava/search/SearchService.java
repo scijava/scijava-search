@@ -34,32 +34,45 @@ package org.scijava.search;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.scijava.plugin.PluginService;
+import org.scijava.plugin.SingletonService;
 import org.scijava.service.SciJavaService;
 
 /**
- * Interface for service that manages search results.
+ * A service that performs asynchronous searches.
  *
  * @author Curtis Rueden
  */
-public interface SearchService extends SciJavaService {
+public interface SearchService extends SingletonService<SearchActionFactory>,
+	SciJavaService
+{
 
 	/**
-	 * Gets the service responsible for discovering and managing this service's
-	 * plugins.
+	 * Begins an asynchronous and multi-threaded search operation.
+	 * 
+	 * @param callbacks The objects to be notified as search results are found.
+	 *          Callbacks will be made on the thread doing the search,
+	 *          <em>not</em> the dispatch thread; it is the responsibility of
+	 *          listeners to queue to the dispatch thread accordingly as needed
+	 *          (e.g., to update UI elements).
+	 * @return An object to use for managing the state of the search.
 	 */
-	default PluginService pluginService() {
-		return context().getService(PluginService.class);
-	}
-
-	/** Begin an asynchronous, multi-threaded search operation. */
 	default SearchOperation search(final SearchListener... callbacks) {
-		return new SearchOperation(callbacks);
+		return new DefaultSearchOperation(context(), callbacks);
 	}
 
+	/**
+	 * Gets the suite of available actions for the given search result.
+	 * 
+	 * @param result The search result for which available actions are desired.
+	 * @return A list of actions which could possibly be executed for the result.
+	 */
 	default List<SearchAction> actions(final SearchResult result) {
-		return pluginService().createInstancesOfType(SearchActionFactory.class)
-			.stream().filter(factory -> factory.supports(result)).map(
-				factory -> factory.create(result)).collect(Collectors.toList());
+		return getInstances().stream().filter(factory -> factory.supports(result))
+			.map(factory -> factory.create(result)).collect(Collectors.toList());
+	}
+
+	@Override
+	default Class<SearchActionFactory> getPluginType() {
+		return SearchActionFactory.class;
 	}
 }

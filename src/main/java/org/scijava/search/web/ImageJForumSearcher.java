@@ -37,17 +37,13 @@ public class ImageJForumSearcher extends AbstractWebSearcher {
                 webSearchContent = s.next();
             } catch (NoSuchElementException e) {
                 e.printStackTrace();
-                return null;
+                return getSearchResults();
             }
             webSearchContent = webSearchContent.substring(webSearchContent.indexOf("[{") + 2, webSearchContent.indexOf("}]"));
 
             String[] results = webSearchContent.split("\\},\\{");
             for (String result : results) {
                 HashMap<String, String> metaInfo = parseForumSearchResult(result);
-
-                for (String key : metaInfo.keySet()) {
-                    System.out.println(key + " = " + metaInfo.get(key));
-                }
 
                 final String forumPostUrl = "http://forum.imagej.net/t/" + metaInfo.get("slug") + "/" + metaInfo.get("id") + "/";
 

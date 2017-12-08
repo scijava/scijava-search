@@ -71,6 +71,7 @@ import org.scijava.plugin.Parameter;
 import org.scijava.plugin.PluginInfo;
 import org.scijava.plugin.PluginService;
 import org.scijava.plugin.SciJavaPlugin;
+import org.scijava.search.SearchAction;
 import org.scijava.search.SearchEvent;
 import org.scijava.search.SearchOperation;
 import org.scijava.search.SearchResult;
@@ -193,8 +194,16 @@ public class SwingSearchBar extends JTextField {
 
 	// -- Helper methods --
 
+	/** Defensive programming check to avoid bugs. */
+	private void assertDispatchThread() {
+		if (!threadService.isDispatchThread()) {
+			throw new IllegalStateException("Current thread is not EDT");
+		}
+	}
+
 	/** Called whenever the user types something. */
 	private void search() {
+		assertDispatchThread();
 		if (dialog == null) {
 			if (getText().equals("") || getText().equals(DEFAULT_MESSAGE)) {
 				// NB: Defer creating a new search dialog until something is typed.
@@ -221,11 +230,13 @@ public class SwingSearchBar extends JTextField {
 
 	/** Called when the user hits ENTER. */
 	private void run() {
-		System.out.println("TODO: execute default search action");
+		assertDispatchThread();
+		searchPanel.execute();
 		reset();
 	}
 
 	private void reset() {
+		assertDispatchThread();
 		if (dialog != null) {
 			searchPanel = null;
 			dialog.dispose();
@@ -240,6 +251,7 @@ public class SwingSearchBar extends JTextField {
 	}
 
 	private void loseFocus() {
+		assertDispatchThread();
 		// NB: Default action: do nothing.
 	}
 
@@ -253,7 +265,7 @@ public class SwingSearchBar extends JTextField {
 
 		public SwingSearchPanel() {
 			operation = searchService.search(//
-				event -> threadService.queue(() -> searchPanel.update(event)));
+				event -> threadService.queue(() -> update(event)));
 
 			allResults = new HashMap<>();
 			resultsList = new JList<>();
@@ -290,16 +302,20 @@ public class SwingSearchBar extends JTextField {
 			add(splitPane, BorderLayout.CENTER);
 		}
 
-		public void update(SearchEvent event) {
-			allResults.put(event.searcher().getClass(), event);
-			rebuild();
-		}
-
 		public void search(final String text) {
 			operation.search(text);
 		}
 
-		public void up() {
+		// -- Helper methods --
+
+		private void update(final SearchEvent event) {
+			assertDispatchThread();
+			allResults.put(event.searcher().getClass(), event);
+			rebuild();
+		}
+
+		private void up() {
+			assertDispatchThread();
 			final int rowCount = resultsList.getModel().getSize();
 			if (rowCount == 0) return;
 			// Move upward in the list one element at a time, skipping headers.
@@ -307,11 +323,12 @@ public class SwingSearchBar extends JTextField {
 			do {
 				index = (index + rowCount - 1) % rowCount;
 			}
-			while (result(index) instanceof SearchResultHeader);
+			while (isHeader(result(index)));
 			select(index);
 		}
 
-		public void down() {
+		private void down() {
+			assertDispatchThread();
 			final int rowCount = resultsList.getModel().getSize();
 			if (rowCount == 0) return;
 			// Move downward in the list one element at a time, skipping headers.
@@ -319,13 +336,22 @@ public class SwingSearchBar extends JTextField {
 			do {
 				index = (index + 1) % rowCount;
 			}
-			while (result(index) instanceof SearchResultHeader);
+			while (isHeader(result(index)));
 			select(index);
 		}
 
-		// -- Helper methods --
+		/** Executes the default search action. */
+		private void execute() {
+			assertDispatchThread();
+			final SearchResult result = resultsList.getSelectedValue();
+			if (result == null) return;
+			List<SearchAction> actions = searchService.actions(result);
+			if (actions.isEmpty()) return;
+			threadService.run(() -> actions.get(0).run());
+		}
 
 		private void rebuild() {
+			assertDispatchThread();
 			// Gets list of Searchers, sorted by priority.
 			final List<Searcher> searchers = allResults.values().stream().map(
 				event -> event.searcher()).collect(Collectors.toList());
@@ -347,6 +373,7 @@ public class SwingSearchBar extends JTextField {
 		}
 
 		private List<SearchResult> results(final Searcher searcher) {
+			assertDispatchThread();
 			return allResults.get(searcher.getClass()).results().stream().limit(
 				MAX_RESULTS).collect(Collectors.toList());
 		}
@@ -375,15 +402,18 @@ public class SwingSearchBar extends JTextField {
 		}
 
 		private SearchResult result(final int index) {
+			assertDispatchThread();
 			return resultsList.getModel().getElementAt(index);
 		}
 
 		private void select(final int i) {
+			assertDispatchThread();
 			resultsList.setSelectedIndex(i);
 			resultsList.ensureIndexIsVisible(isFirstNonHeader(i) ? 0 : i);
 		}
 
 		private boolean isFirstNonHeader(final int index) {
+			assertDispatchThread();
 			for (int i = index; i >= 0; i--) {
 				if (!isHeader(result(i))) return false;
 			}

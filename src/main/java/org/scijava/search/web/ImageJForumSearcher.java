@@ -32,13 +32,10 @@ public class ImageJForumSearcher extends AbstractWebSearcher {
             s.useDelimiter("\"topics\":");
 
             String webSearchContent;
-            try {
-                s.next();
-                webSearchContent = s.next();
-            } catch (NoSuchElementException e) {
-                e.printStackTrace();
-                return getSearchResults();
-            }
+            if (!s.hasNext()) return getSearchResults();
+            s.next();
+            if (!s.hasNext()) return getSearchResults();
+            webSearchContent = s.next();
             webSearchContent = webSearchContent.substring(webSearchContent.indexOf("[{") + 2, webSearchContent.indexOf("}]"));
 
             String[] results = webSearchContent.split("\\},\\{");

@@ -22,14 +22,13 @@ public class ModuleSearchResult implements SearchResult {
 
 	private final ModuleInfo info;
 	private final String baseDir;
-	private HashMap<String, String> props;
+	private final HashMap<String, String> props;
 
 	public ModuleSearchResult(final ModuleInfo info, final String baseDir) {
 		this.info = info;
 		this.baseDir = baseDir;
 
 		props = new HashMap<>();
-		props.put("Hello", "World");
 		props.put("Title", info.getTitle());
 		final MenuPath menuPath = info.getMenuPath();
 		if (menuPath != null) {

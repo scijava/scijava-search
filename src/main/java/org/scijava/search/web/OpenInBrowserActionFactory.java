@@ -1,11 +1,12 @@
 
 package org.scijava.search.web;
 
-import java.awt.Desktop;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.net.URL;
 
+import org.scijava.log.LogService;
+import org.scijava.platform.PlatformService;
+import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 import org.scijava.search.DefaultSearchAction;
 import org.scijava.search.SearchAction;
@@ -22,6 +23,12 @@ public class OpenInBrowserActionFactory implements
 	SearchActionFactory
 {
 
+	@Parameter
+	private PlatformService platformService;
+
+	@Parameter
+	private LogService log;
+
 	@Override
 	public boolean supports(final SearchResult result) {
 		return result instanceof WebSearchResult;
@@ -29,16 +36,17 @@ public class OpenInBrowserActionFactory implements
 
 	@Override
 	public SearchAction create(final SearchResult result) {
-		return new DefaultSearchAction("Open in Browser", () -> {
-			try {
-				Desktop.getDesktop().browse(new URI(result.properties().get("url")));
-			}
-			catch (final IOException e1) {
-				e1.printStackTrace();
-			}
-			catch (final URISyntaxException e1) {
-				e1.printStackTrace();
-			}
-		});
+		return new DefaultSearchAction("Open in Browser", //
+			() -> openURL(result));
+	}
+
+	private void openURL(final SearchResult result) {
+		try {
+			final URL url = new URL(result.properties().get("url"));
+			platformService.open(url);
+		}
+		catch (final IOException exc) {
+			log.error(exc);
+		}
 	}
 }

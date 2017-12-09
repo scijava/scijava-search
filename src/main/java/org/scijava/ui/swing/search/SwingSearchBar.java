@@ -429,11 +429,14 @@ public class SwingSearchBar extends JTextField {
 			// Build the new list model.
 			DefaultListModel<SearchResult> listModel = new DefaultListModel<>();
 			for (final Searcher searcher : searchers) {
+				final List<SearchResult> results = results(searcher);
+				if (results.isEmpty()) continue;
+
 				// Add section header.
 				listModel.addElement(new SearchResultHeader(searcher.title()));
 
 				// Add results as entries.
-				for (final SearchResult result : results(searcher)) {
+				for (final SearchResult result : results) {
 					listModel.addElement(result);
 				}
 			}

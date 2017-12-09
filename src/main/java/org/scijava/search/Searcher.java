@@ -22,6 +22,11 @@ public interface Searcher extends SciJavaPlugin {
 	 */
 	String title();
 
+	/** Gets whether this plugin wants exclusive rights to the given text. */
+	default boolean exclusive(@SuppressWarnings("unused") final String text) {
+		return false;
+	}
+
 	/** Searches for the given text. */
 	List<SearchResult> search(String text, boolean fuzzy);
 }

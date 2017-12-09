@@ -429,8 +429,14 @@ public class SwingSearchBar extends JTextField {
 			// Build the new list model.
 			DefaultListModel<SearchResult> listModel = new DefaultListModel<>();
 			for (final Searcher searcher : searchers) {
-				final List<SearchResult> results = results(searcher);
-				if (results.isEmpty()) continue;
+				// Look up the results list.
+				final List<SearchResult> completeResults = //
+					allResults.get(searcher.getClass()).results();
+				if (completeResults.isEmpty()) continue;
+
+				// Limit to the top MAX_RESULTS matches only.
+				final List<SearchResult> results = completeResults.stream() //
+					.limit(MAX_RESULTS).collect(Collectors.toList());
 
 				// Add section header.
 				listModel.addElement(new SearchResultHeader(searcher.title()));
@@ -445,12 +451,6 @@ public class SwingSearchBar extends JTextField {
 			// TODO: Improve retainment of previous selection.
 			if (previous == null) resultsList.setSelectedIndex(firstResultIndex());
 			else resultsList.setSelectedValue(previous, true);
-		}
-
-		private List<SearchResult> results(final Searcher searcher) {
-			assertDispatchThread();
-			return allResults.get(searcher.getClass()).results().stream().limit(
-				MAX_RESULTS).collect(Collectors.toList());
 		}
 
 		private Component icon(final String iconPath) {

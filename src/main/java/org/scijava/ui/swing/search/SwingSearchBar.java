@@ -61,7 +61,9 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTextField;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
+import javax.swing.border.MatteBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
@@ -273,7 +275,9 @@ public class SwingSearchBar extends JTextField {
 				cellHasFocus) -> {
 				if (isHeader(value)) {
 					final JLabel header = new JLabel(value.name());
-					header.setBorder(new EmptyBorder(PAD, PAD, 0, PAD));
+					header.setBorder(new CompoundBorder(//
+						new EmptyBorder(PAD, PAD, 0, PAD),
+						new MatteBorder(0, 0, 1, 0, Color.gray)));
 					header.setBackground(HEADER_COLOR);
 					header.setEnabled(false);
 					return header;

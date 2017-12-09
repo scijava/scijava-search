@@ -2,7 +2,7 @@ package org.scijava.search.module;
 
 import java.io.File;
 import java.net.URL;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.scijava.MenuEntry;
@@ -22,13 +22,13 @@ public class ModuleSearchResult implements SearchResult {
 
 	private final ModuleInfo info;
 	private final String baseDir;
-	private final HashMap<String, String> props;
+	private final Map<String, String> props;
 
 	public ModuleSearchResult(final ModuleInfo info, final String baseDir) {
 		this.info = info;
 		this.baseDir = baseDir;
 
-		props = new HashMap<>();
+		props = new LinkedHashMap<>();
 		props.put("Title", info.getTitle());
 		final MenuPath menuPath = info.getMenuPath();
 		if (menuPath != null) {

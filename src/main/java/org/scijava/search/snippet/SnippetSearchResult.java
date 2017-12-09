@@ -1,6 +1,6 @@
 package org.scijava.search.snippet;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -17,7 +17,7 @@ public class SnippetSearchResult implements SearchResult {
 
 	private final ScriptLanguage language;
 	private final String snippet;
-	private final HashMap<String, String> props;
+	private final Map<String, String> props;
 
 	public SnippetSearchResult(final ScriptLanguage language,
 		final String snippet)
@@ -25,7 +25,7 @@ public class SnippetSearchResult implements SearchResult {
 		this.language = language;
 		this.snippet = snippet;
 
-		props = new HashMap<>();
+		props = new LinkedHashMap<>();
 		props.put("Language", language.getLanguageName());
 		props.put("Nicknames", s(language.getNames()));
 		props.put("Extensions", s(language.getExtensions()));

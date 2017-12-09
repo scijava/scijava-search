@@ -368,6 +368,7 @@ public class SwingSearchBar extends JTextField {
 		}
 
 		public void search(final String text) {
+			assertDispatchThread();
 			operation.search(text);
 		}
 
@@ -376,6 +377,7 @@ public class SwingSearchBar extends JTextField {
 		/** Called whenever a new batch of search results comes in. */
 		private void update(final SearchEvent event) {
 			assertDispatchThread();
+			if (event.exclusive()) allResults.clear();
 			allResults.put(event.searcher().getClass(), event);
 			rebuild();
 		}

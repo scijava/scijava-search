@@ -35,6 +35,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.GridLayout;
 import java.awt.Window;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
@@ -65,12 +66,9 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
-import javax.swing.border.LineBorder;
 import javax.swing.border.MatteBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-
-import net.miginfocom.swing.MigLayout;
 
 import org.scijava.Context;
 import org.scijava.Priority;
@@ -309,7 +307,6 @@ public class SwingSearchBar extends JTextField {
 			final JLabel detailsTitle = new JLabel();
 			detailsTitle.setHorizontalAlignment(SwingConstants.CENTER);
 			final JPanel detailsProps = new JPanel();
-			detailsProps.setLayout(new MigLayout("fillx,wrap 2", "[50%|50%]"));
 			final JPanel detailsButtons = new JPanel();
 			detailsButtons.setLayout(new BoxLayout(detailsButtons, BoxLayout.X_AXIS));
 			detailsTitle.setAlignmentX(0.5f);
@@ -320,15 +317,12 @@ public class SwingSearchBar extends JTextField {
 			detailsPane.add(detailsTitle);
 			detailsPane.add(detailsProps);
 			detailsPane.add(detailsButtons);
-			// DEBUG
-			detailsTitle.setBorder(new LineBorder(Color.red, 1));
-			detailsProps.setBorder(new LineBorder(Color.red, 1));
-			detailsButtons.setBorder(new LineBorder(Color.red, 1));
+			detailsPane.add(Box.createVerticalGlue());
 
 			resultsList.addListSelectionListener(lse -> {
 				if (lse.getValueIsAdjusting()) return;
 				final SearchResult result = resultsList.getSelectedValue();
-				if (result == null) {
+				if (result == null || isHeader(result)) {
 					// clear details pane
 					detailsTitle.setText("");
 					detailsProps.removeAll();
@@ -338,12 +332,18 @@ public class SwingSearchBar extends JTextField {
 					// populate details pane
 					detailsTitle.setText("<html><h2>" + result.name() + "</h2>");
 					detailsProps.removeAll();
+					detailsProps.setLayout(new GridLayout(result.properties().size(), 2));
 					result.properties().forEach((k, v) -> {
-						final JLabel kLabel = new JLabel(
-							"<html><strong style=\"color: gray\">" + k + "</strong>");
-						kLabel.setHorizontalAlignment(SwingConstants.RIGHT);
-						detailsProps.add(kLabel);
-						detailsProps.add(new JLabel(v));
+						final JLabel keyLabel = new JLabel("<html>" +
+							"<strong style=\"color: gray; padding-right: 5px\">" + k +
+							"&nbsp;&nbsp;</strong>", SwingConstants.RIGHT);
+						detailsProps.add(keyLabel);
+						final JTextField valueField = new JTextField();
+						valueField.setText(v);
+						valueField.setEditable(false);
+						valueField.setBackground(null);
+						valueField.setBorder(null);
+						detailsProps.add(valueField);
 					});
 					detailsButtons.removeAll();
 					final List<SearchAction> actions = searchService.actions(result);
@@ -453,9 +453,7 @@ public class SwingSearchBar extends JTextField {
 		private Component icon(final String iconPath) {
 			// TODO make icon() return URL, not String.
 			if (iconPath == null || iconPath.isEmpty()) return emptyIcon();
-//			final URL iconURL = getClass().getResource(iconPath);
-			// TEMP FOR TESTING
-			final URL iconURL = getClass().getResource("/icons/legacy.png");
+			final URL iconURL = getClass().getResource(iconPath);
 			final ImageIcon icon = new ImageIcon(iconURL);
 			if (icon.getIconWidth() != ICON_SIZE || //
 				icon.getIconHeight() != ICON_SIZE)

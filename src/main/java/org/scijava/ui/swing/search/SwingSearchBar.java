@@ -53,6 +53,7 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -61,11 +62,15 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTextField;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.SwingConstants;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
 import javax.swing.border.MatteBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+
+import net.miginfocom.swing.MigLayout;
 
 import org.scijava.Context;
 import org.scijava.Priority;
@@ -161,7 +166,7 @@ public class SwingSearchBar extends JTextField {
 
 			@Override
 			public void focusGained(final FocusEvent e) {
-				setText("");
+				if (DEFAULT_MESSAGE.equals(getText())) setText("");
 			}
 
 			@Override
@@ -174,7 +179,10 @@ public class SwingSearchBar extends JTextField {
 
 	/** Called externally to bring the search bar into focus. */
 	public void activate() {
-		requestFocus();
+		threadService.queue(() -> {
+			setText("");
+			requestFocus();
+		});
 	}
 
 	// -- Utility methods --
@@ -270,6 +278,7 @@ public class SwingSearchBar extends JTextField {
 				event -> threadService.queue(() -> update(event)));
 
 			allResults = new HashMap<>();
+
 			resultsList = new JList<>();
 			resultsList.setCellRenderer((list, value, index, isSelected,
 				cellHasFocus) -> {
@@ -291,18 +300,70 @@ public class SwingSearchBar extends JTextField {
 				item.setBackground(isSelected ? SELECTED_COLOR : list.getBackground());
 				return item;
 			});
+			resultsList.setBorder(new EmptyBorder(0, 0, PAD, 0));
+			final JScrollPane resultsPane = new JScrollPane(resultsList);
+			resultsPane.setHorizontalScrollBarPolicy(
+				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 
+			final JPanel detailsPane = new JPanel();
+			final JLabel detailsTitle = new JLabel();
+			detailsTitle.setHorizontalAlignment(SwingConstants.CENTER);
+			final JPanel detailsProps = new JPanel();
+			detailsProps.setLayout(new MigLayout("fillx,wrap 2", "[50%|50%]"));
+			final JPanel detailsButtons = new JPanel();
+			detailsButtons.setLayout(new BoxLayout(detailsButtons, BoxLayout.X_AXIS));
+			detailsTitle.setAlignmentX(0.5f);
+			detailsProps.setAlignmentX(0.5f);
+			detailsButtons.setAlignmentX(0.5f);
+
+			detailsPane.setLayout(new BoxLayout(detailsPane, BoxLayout.Y_AXIS));
+			detailsPane.add(detailsTitle);
+			detailsPane.add(detailsProps);
+			detailsPane.add(detailsButtons);
+			// DEBUG
+			detailsTitle.setBorder(new LineBorder(Color.red, 1));
+			detailsProps.setBorder(new LineBorder(Color.red, 1));
+			detailsButtons.setBorder(new LineBorder(Color.red, 1));
+
+			resultsList.addListSelectionListener(lse -> {
+				if (lse.getValueIsAdjusting()) return;
+				final SearchResult result = resultsList.getSelectedValue();
+				if (result == null) {
+					// clear details pane
+					detailsTitle.setText("");
+					detailsProps.removeAll();
+					detailsButtons.removeAll();
+				}
+				else {
+					// populate details pane
+					detailsTitle.setText("<html><h2>" + result.name() + "</h2>");
+					detailsProps.removeAll();
+					result.properties().forEach((k, v) -> {
+						final JLabel kLabel = new JLabel(
+							"<html><strong style=\"color: gray\">" + k + "</strong>");
+						kLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+						detailsProps.add(kLabel);
+						detailsProps.add(new JLabel(v));
+					});
+					detailsButtons.removeAll();
+					final List<SearchAction> actions = searchService.actions(result);
+					actions.forEach(action -> {
+						final JButton button = new JButton(action.toString());
+						button.addActionListener(ae -> {
+							action.run();
+							reset();
+						});
+						detailsButtons.add(button);
+					});
+				}
+			});
+
+			setLayout(new BorderLayout());
 			setPreferredSize(new Dimension(800, 300));
 
 			final JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-			resultsList.setBorder(new EmptyBorder(0, 0, PAD, 0));
-			final JScrollPane resultsPane = new JScrollPane(resultsList);
-			resultsPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-			final JPanel detailsPane = new JPanel();
 			splitPane.setLeftComponent(resultsPane);
 			splitPane.setRightComponent(detailsPane);
-
-			setLayout(new BorderLayout());
 			add(splitPane, BorderLayout.CENTER);
 		}
 
@@ -312,6 +373,7 @@ public class SwingSearchBar extends JTextField {
 
 		// -- Helper methods --
 
+		/** Called whenever a new batch of search results comes in. */
 		private void update(final SearchEvent event) {
 			assertDispatchThread();
 			allResults.put(event.searcher().getClass(), event);
@@ -349,18 +411,22 @@ public class SwingSearchBar extends JTextField {
 			assertDispatchThread();
 			final SearchResult result = resultsList.getSelectedValue();
 			if (result == null) return;
-			List<SearchAction> actions = searchService.actions(result);
+			final List<SearchAction> actions = searchService.actions(result);
 			if (actions.isEmpty()) return;
 			threadService.run(() -> actions.get(0).run());
 		}
 
 		private void rebuild() {
 			assertDispatchThread();
+
+			final SearchResult previous = resultsList.getSelectedValue();
+
 			// Gets list of Searchers, sorted by priority.
 			final List<Searcher> searchers = allResults.values().stream().map(
 				event -> event.searcher()).collect(Collectors.toList());
 			sort(searchers, Searcher.class);
 
+			// Build the new list model.
 			DefaultListModel<SearchResult> listModel = new DefaultListModel<>();
 			for (final Searcher searcher : searchers) {
 				// Add section header.
@@ -372,6 +438,10 @@ public class SwingSearchBar extends JTextField {
 				}
 			}
 			resultsList.setModel(listModel);
+
+			// TODO: Improve retainment of previous selection.
+			if (previous == null) resultsList.setSelectedIndex(firstResultIndex());
+			else resultsList.setSelectedValue(previous, true);
 		}
 
 		private List<SearchResult> results(final Searcher searcher) {
@@ -406,6 +476,14 @@ public class SwingSearchBar extends JTextField {
 		private SearchResult result(final int index) {
 			assertDispatchThread();
 			return resultsList.getModel().getElementAt(index);
+		}
+
+		private int firstResultIndex() {
+			assertDispatchThread();
+			for (int i = 0; i < resultsList.getModel().getSize(); i++) {
+				if (!isHeader(result(i))) return i;
+			}
+			return -1;
 		}
 
 		private void select(final int i) {

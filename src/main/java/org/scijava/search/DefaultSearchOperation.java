@@ -126,10 +126,11 @@ public class DefaultSearchOperation implements SearchOperation {
 
 		@Override
 		public void run() {
+			final boolean exclusive = searcher.exclusive(query);
 			final List<SearchResult> results = searcher.search(query, fuzzy);
 			if (!valid) return;
 			for (final SearchListener l : listeners) {
-				l.searchCompleted(new SearchEvent(searcher, results));
+				l.searchCompleted(new SearchEvent(searcher, results, exclusive));
 			}
 		}
 	}

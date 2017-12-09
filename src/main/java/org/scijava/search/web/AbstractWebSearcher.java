@@ -39,7 +39,8 @@ public abstract class AbstractWebSearcher implements Searcher
    * @param details some text from the website representing its content
    */
   protected void addResult(String name, String iconPath, String url, String details) {
-    searchResults.add(new WebSearchResult(name, iconPath, url, details));
+		searchResults.add(new WebSearchResult(name, //
+			iconPath == null || iconPath.isEmpty() ? "/icons/world_link.png" : iconPath, url, details));
   }
 
   public ArrayList<SearchResult> getSearchResults()

@@ -26,7 +26,7 @@ public class OpenWebSearchResultInBrowserActionFactory implements
 {
   @Override
   public boolean supports(final SearchResult result) {
-    return result instanceof WebServiceException;
+    return result instanceof WebSearchResult;
   }
 
   @Override

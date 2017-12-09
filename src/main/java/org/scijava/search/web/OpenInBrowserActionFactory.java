@@ -18,7 +18,7 @@ import org.scijava.search.SearchResult;
  * @author Robert Haase (MPI-CBG)
  */
 @Plugin(type = SearchActionFactory.class)
-public class OpenWebSearchResultInBrowserActionFactory implements
+public class OpenInBrowserActionFactory implements
 	SearchActionFactory
 {
 

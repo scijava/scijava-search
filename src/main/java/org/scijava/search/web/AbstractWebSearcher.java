@@ -1,3 +1,4 @@
+
 package org.scijava.search.web;
 
 import java.util.ArrayList;
@@ -6,47 +7,44 @@ import org.scijava.search.SearchResult;
 import org.scijava.search.Searcher;
 
 /**
- * The AbstractWebSearcher contains convenience function to manage
- * search results of all Searchers browing the web.
- *
- *
- * Author: Robert Haase (http://haesleinhuepf.net) at MPI CBG (http://mpi-cbg.de)
- * December 2017
+ * The AbstractWebSearcher contains convenience functions to manage search
+ * results of all {@link Searcher} plugins browsing the web.
+ * 
+ * @author Robert Haase (MPI-CBG)
  */
-public abstract class AbstractWebSearcher implements Searcher
-{
-  private String title;
-  private ArrayList<SearchResult> searchResults = new ArrayList<SearchResult>();
+public abstract class AbstractWebSearcher implements Searcher {
 
-  /**
-   *
-   * @param title Name of the search engine
-   */
-  public AbstractWebSearcher(String title) {
-    this.title = title;
-  }
+	private final String title;
+	private final ArrayList<SearchResult> searchResults = new ArrayList<>();
 
-  @Override public String title()
-  {
-    return title;
-  }
+	/**
+	 * @param title Name of the search engine
+	 */
+	public AbstractWebSearcher(final String title) {
+		this.title = title;
+	}
 
-  /**
-   *
-   * @param name Resulting website title / name
-   * @param iconPath path to an image representing the results
-   * @param url URL of the found website
-   * @param details some text from the website representing its content
-   */
-  protected void addResult(String name, String iconPath, String url, String details) {
+	@Override
+	public String title() {
+		return title;
+	}
+
+	/**
+	 * @param name Resulting website title / name
+	 * @param iconPath path to an image representing the results
+	 * @param url URL of the found website
+	 * @param details some text from the website representing its content
+	 */
+	protected void addResult(final String name, final String iconPath,
+		final String url, final String details)
+	{
 		searchResults.add(new WebSearchResult(name, //
-			iconPath == null || iconPath.isEmpty() ? "/icons/world_link.png" : iconPath, url, details));
-  }
+			iconPath == null || iconPath.isEmpty() ? "/icons/world_link.png"
+				: iconPath, url, details));
+	}
 
-  public ArrayList<SearchResult> getSearchResults()
-  {
-    return searchResults;
-  }
-
+	public ArrayList<SearchResult> getSearchResults() {
+		return searchResults;
+	}
 
 }

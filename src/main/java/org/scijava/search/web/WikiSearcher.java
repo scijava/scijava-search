@@ -1,5 +1,5 @@
-package org.scijava.search.web;
 
+package org.scijava.search.web;
 
 import java.io.IOException;
 import java.net.URL;
@@ -19,110 +19,120 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 /**
- * The Wiki search allows users to find help on http://imagej.net/
+ * A searcher for finding pages of the <a href="https://imagej.net/">ImageJ
+ * wiki</a>.
  *
- * @author Robert Haase, http://github.com/haesleinhuepf
+ * @author Robert Haase (MPI-CBG)
  */
 @Plugin(type = Searcher.class, name = "ImageJ Wiki")
 public class WikiSearcher extends AbstractWebSearcher {
 
-    public WikiSearcher() {
-        super("ImageJ Wiki");
-    }
-    @Override public List<SearchResult> search(String text,
-                                               boolean fuzzy)
-    {
-        try {
-            URL url = new URL("http://imagej.net/index.php?title=Special%3ASearch&search=" + URLEncoder.encode(text) + "&go=Search&source=imagej");
+	public WikiSearcher() {
+		super("ImageJ Wiki");
+	}
 
-            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-            DocumentBuilder db = dbf.newDocumentBuilder();
-            Document doc = db.parse(url.openStream());
+	@Override
+	public List<SearchResult> search(final String text, final boolean fuzzy) {
+		try {
+			final URL url = new URL(
+				"http://imagej.net/index.php?title=Special%3ASearch&search=" +
+					URLEncoder.encode(text) + "&go=Search&source=imagej");
 
-            parse(doc.getDocumentElement());
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        } catch (ParserConfigurationException e) {
-            e.printStackTrace();
-        } catch (SAXException e) {
-            e.printStackTrace();
-        }
+			final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+			final DocumentBuilder db = dbf.newDocumentBuilder();
+			final Document doc = db.parse(url.openStream());
 
-        return getSearchResults();
-    }
+			parse(doc.getDocumentElement());
+		}
+		catch (final IOException ex) {
+			ex.printStackTrace();
+		}
+		catch (final ParserConfigurationException e) {
+			e.printStackTrace();
+		}
+		catch (final SAXException e) {
+			e.printStackTrace();
+		}
 
-    String currentHeading;
-    String currentLink;
+		return getSearchResults();
+	}
 
-    private void parseHeading(Node node) {
+	String currentHeading;
+	String currentLink;
 
-        if (node.getTextContent() != null && node.getTextContent().trim().length() > 0) {
-            currentHeading = node.getTextContent();
-        }
-        if (node.getAttributes() != null) {
-            Node href = node.getAttributes().getNamedItem("href");
-            if (href != null) {
-                currentLink = "http://imagej.net" + href.getNodeValue();
-            }
-        }
+	private void parseHeading(final Node node) {
 
-        NodeList nodeList = node.getChildNodes();
-        for (int i = 0; i < nodeList.getLength(); i++) {
-            Node childNode = nodeList.item(i);
+		if (node.getTextContent() != null && node.getTextContent().trim()
+			.length() > 0)
+		{
+			currentHeading = node.getTextContent();
+		}
+		if (node.getAttributes() != null) {
+			final Node href = node.getAttributes().getNamedItem("href");
+			if (href != null) {
+				currentLink = "http://imagej.net" + href.getNodeValue();
+			}
+		}
 
-            parseHeading(childNode);
-        }
-    }
+		final NodeList nodeList = node.getChildNodes();
+		for (int i = 0; i < nodeList.getLength(); i++) {
+			final Node childNode = nodeList.item(i);
 
-    String currentContent;
+			parseHeading(childNode);
+		}
+	}
 
-    private void parseContent(Node node) {
-        if (node.getTextContent() != null) {
-            currentContent = node.getTextContent();
-        }
+	String currentContent;
 
-        NodeList nodeList = node.getChildNodes();
-        for (int i = 0; i < nodeList.getLength(); i++) {
-            Node childNode = nodeList.item(i);
+	private void parseContent(final Node node) {
+		if (node.getTextContent() != null) {
+			currentContent = node.getTextContent();
+		}
 
-            parse(childNode);
-        }
-    }
+		final NodeList nodeList = node.getChildNodes();
+		for (int i = 0; i < nodeList.getLength(); i++) {
+			final Node childNode = nodeList.item(i);
 
-    private void saveLastItem() {
-        if (currentHeading != null && currentHeading.length() > 0) {
-            addResult(currentHeading, "", currentLink, currentContent);
-        }
-        currentHeading = "";
-        currentLink = "";
-        currentContent = "";
-    }
+			parse(childNode);
+		}
+	}
 
-    private void parse(Node node) {
-        if (node.getNodeName().equals("div")) {
-            Node item = node.getAttributes() == null ? null : node.getAttributes().getNamedItem("class");
-            if (item != null && item.getNodeValue().equals("mw-search-result-heading")) {
+	private void saveLastItem() {
+		if (currentHeading != null && currentHeading.length() > 0) {
+			addResult(currentHeading, "", currentLink, currentContent);
+		}
+		currentHeading = "";
+		currentLink = "";
+		currentContent = "";
+	}
 
-                if (currentHeading != null) {
-                    saveLastItem();
-                }
-                parseHeading(node);
+	private void parse(final Node node) {
+		if (node.getNodeName().equals("div")) {
+			final Node item = node.getAttributes() == null ? null : node
+				.getAttributes().getNamedItem("class");
+			if (item != null && item.getNodeValue().equals(
+				"mw-search-result-heading"))
+			{
 
-                return;
-            }
-            if (item != null && item.getNodeValue().equals("searchresult")) {
-                parseContent(node);
-                return;
-            }
-        }
+				if (currentHeading != null) {
+					saveLastItem();
+				}
+				parseHeading(node);
 
+				return;
+			}
+			if (item != null && item.getNodeValue().equals("searchresult")) {
+				parseContent(node);
+				return;
+			}
+		}
 
-        NodeList nodeList = node.getChildNodes();
-        for (int i = 0; i < nodeList.getLength(); i++) {
-            Node childNode = nodeList.item(i);
+		final NodeList nodeList = node.getChildNodes();
+		for (int i = 0; i < nodeList.getLength(); i++) {
+			final Node childNode = nodeList.item(i);
 
-            parse(childNode);
-        }
+			parse(childNode);
+		}
 
-    }
+	}
 }

@@ -2,7 +2,9 @@
 package org.scijava.search;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import org.scijava.Context;
 import org.scijava.log.LogService;
@@ -88,7 +90,15 @@ public class DefaultSearchOperation implements SearchOperation {
 	// -- Helper methods --
 
 	private List<Searcher> searchers() {
-		return pluginService.createInstancesOfType(Searcher.class);
+		final List<Searcher> searchers = //
+			pluginService.createInstancesOfType(Searcher.class);
+
+		// Check for a searcher that wants exclusive rights.
+		final Optional<Searcher> exclusive = searchers.stream().filter(
+			searcher -> searcher.exclusive(query)).findFirst();
+
+		return exclusive.isPresent() ? //
+			Collections.singletonList(exclusive.get()) : searchers;
 	}
 
 	private void cancelCurrentSearches() {

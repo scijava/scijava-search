@@ -64,12 +64,15 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTextField;
+import javax.swing.JTextPane;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+
+import net.miginfocom.swing.MigLayout;
 
 import org.scijava.Context;
 import org.scijava.Priority;
@@ -335,18 +338,26 @@ public class SwingSearchBar extends JTextField {
 					// populate details pane
 					detailsTitle.setText("<html><h2>" + result.name() + "</h2>");
 					detailsProps.removeAll();
-					detailsProps.setLayout(new GridLayout(result.properties().size(), 2));
+					detailsProps.setLayout(new MigLayout("fillx,wrap 2", "[200px|pref]", "pref"));
 					result.properties().forEach((k, v) -> {
-						final JLabel keyLabel = new JLabel("<html>" +
-							"<strong style=\"color: gray; padding-right: 5px\">" + k +
-							"&nbsp;&nbsp;</strong>", SwingConstants.RIGHT);
-						detailsProps.add(keyLabel);
-						final JTextField valueField = new JTextField();
-						valueField.setText(v);
-						valueField.setEditable(false);
-						valueField.setBackground(null);
-						valueField.setBorder(null);
-						detailsProps.add(valueField);
+						if (k == null) {
+							final JTextPane textPane = new JTextPane();
+							textPane.setContentType("text/html");
+							textPane.setText(v);
+							detailsProps.add(textPane, "span 2");
+						}
+						else {
+							final JLabel keyLabel = new JLabel("<html>" +
+								"<strong style=\"color: gray; padding-right: 5px\">" + k +
+								"&nbsp;&nbsp;</strong>", SwingConstants.RIGHT);
+							detailsProps.add(keyLabel);
+							final JTextField valueField = new JTextField();
+							valueField.setText(v);
+							valueField.setEditable(false);
+							valueField.setBackground(null);
+							valueField.setBorder(null);
+							detailsProps.add(valueField);
+						}
 					});
 					detailsButtons.removeAll();
 					final List<SearchAction> actions = searchService.actions(result);

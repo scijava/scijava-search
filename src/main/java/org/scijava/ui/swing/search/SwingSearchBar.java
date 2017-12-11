@@ -34,6 +34,7 @@ package org.scijava.ui.swing.search;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.Window;
@@ -41,6 +42,7 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.net.URL;
 import java.util.Collections;
 import java.util.Comparator;
@@ -50,11 +52,13 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import javax.swing.AbstractButton;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -357,6 +361,8 @@ public class SwingSearchBar extends JTextField {
 					});
 				}
 			});
+			
+			resultsList.addKeyListener(new SearchPanelKeyAdapter());
 
 			setLayout(new BorderLayout());
 			setPreferredSize(new Dimension(800, 300));
@@ -365,6 +371,7 @@ public class SwingSearchBar extends JTextField {
 			splitPane.setLeftComponent(resultsPane);
 			splitPane.setRightComponent(detailsPane);
 			add(splitPane, BorderLayout.CENTER);
+			
 		}
 
 		public void search(final String text) {
@@ -501,6 +508,17 @@ public class SwingSearchBar extends JTextField {
 				if (!isHeader(result(i))) return false;
 			}
 			return true;
+		}
+	}
+	
+	private class SearchPanelKeyAdapter extends KeyAdapter {
+		@Override
+		public void keyPressed(final KeyEvent e) {
+			switch (e.getKeyCode()) {
+				case KeyEvent.VK_ESCAPE:
+					reset();
+					break;
+			}
 		}
 	}
 

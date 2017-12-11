@@ -391,29 +391,27 @@ public class SwingSearchBar extends JTextField {
 		}
 
 		private void up() {
+			select(index -> (index + rowCount() - 1) % rowCount());
+		}
+
+		private void down() {
+			select(index -> (index + 1) % rowCount());
+		}
+
+		private void select(final Function<Integer, Integer> stepper) {
 			assertDispatchThread();
-			final int rowCount = resultsList.getModel().getSize();
-			if (rowCount == 0) return;
-			// Move upward in the list one element at a time, skipping headers.
+			if (rowCount() == 0) return;
+			// Step through the list, skipping headers.
 			int index = resultsList.getSelectedIndex();
 			do {
-				index = (index + rowCount - 1) % rowCount;
+				index = stepper.apply(index);
 			}
 			while (isHeader(result(index)));
 			select(index);
 		}
 
-		private void down() {
-			assertDispatchThread();
-			final int rowCount = resultsList.getModel().getSize();
-			if (rowCount == 0) return;
-			// Move downward in the list one element at a time, skipping headers.
-			int index = resultsList.getSelectedIndex();
-			do {
-				index = (index + 1) % rowCount;
-			}
-			while (isHeader(result(index)));
-			select(index);
+		private int rowCount() {
+			return resultsList.getModel().getSize();
 		}
 
 		/** Executes the default search action. */
@@ -491,7 +489,7 @@ public class SwingSearchBar extends JTextField {
 
 		private int firstResultIndex() {
 			assertDispatchThread();
-			for (int i = 0; i < resultsList.getModel().getSize(); i++) {
+			for (int i = 0; i < rowCount(); i++) {
 				if (!isHeader(result(i))) return i;
 			}
 			return -1;

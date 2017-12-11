@@ -30,6 +30,6 @@ public class HelpModuleSearchActionFactory implements SearchActionFactory {
 		return new DefaultSearchAction("Help", () -> {
 			uiService.showDialog("TODO: help with module: " +
 				((ModuleSearchResult) result).info().getTitle());
-		});
+		}, false);
 	}
 }

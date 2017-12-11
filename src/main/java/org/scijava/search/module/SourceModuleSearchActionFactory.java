@@ -30,6 +30,6 @@ public class SourceModuleSearchActionFactory implements SearchActionFactory {
 		return new DefaultSearchAction("Source", () -> {
 			uiService.showDialog("TODO: source for module: " +
 				((ModuleSearchResult) result).info().getTitle());
-		});
+		}, true);
 	}
 }

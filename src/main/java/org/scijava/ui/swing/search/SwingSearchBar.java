@@ -354,7 +354,9 @@ public class SwingSearchBar extends JTextField {
 						final JButton button = new JButton(action.toString());
 						button.addActionListener(ae -> {
 							action.run();
-							reset();
+							if(action.willCloseSearch()){
+								reset();								
+							}
 						});
 						detailsButtons.add(button);
 					});

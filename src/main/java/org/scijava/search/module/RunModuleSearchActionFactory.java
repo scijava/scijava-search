@@ -30,6 +30,6 @@ public class RunModuleSearchActionFactory implements SearchActionFactory {
 	public SearchAction create(final SearchResult result) {
 		return new DefaultSearchAction("Run", () -> {
 			moduleService.run(((ModuleSearchResult) result).info(), true);
-		});
+		}, true);
 	}
 }

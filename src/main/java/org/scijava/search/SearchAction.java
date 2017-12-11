@@ -12,4 +12,8 @@ package org.scijava.search;
  */
 public interface SearchAction extends Runnable {
 	// NB: No implementation needed.
+	
+	default boolean willCloseSearch(){
+		return true;
+	}
 }

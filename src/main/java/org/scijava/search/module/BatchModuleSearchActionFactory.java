@@ -30,6 +30,6 @@ public class BatchModuleSearchActionFactory implements SearchActionFactory {
 		return new DefaultSearchAction("Batch", () -> {
 			uiService.showDialog("TODO: batch with module: " +
 				((ModuleSearchResult) result).info().getTitle());
-		});
+		}, true);
 	}
 }

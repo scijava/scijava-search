@@ -515,6 +515,14 @@ public class SwingSearchBar extends JTextField {
 		@Override
 		public void keyPressed(final KeyEvent e) {
 			switch (e.getKeyCode()) {
+    			case KeyEvent.VK_UP:
+    				if (searchPanel != null) searchPanel.up();
+    				e.consume();
+    				break;
+    			case KeyEvent.VK_DOWN:
+    				if (searchPanel != null) searchPanel.down();
+    				e.consume();
+    				break;
 				case KeyEvent.VK_ESCAPE:
 					reset();
 					break;

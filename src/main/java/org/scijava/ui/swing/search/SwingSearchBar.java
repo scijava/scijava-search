@@ -119,30 +119,7 @@ public class SwingSearchBar extends JTextField {
 		context.inject(this);
 
 		addActionListener(e -> run());
-		addKeyListener(new KeyAdapter() {
-
-			@Override
-			public void keyPressed(final KeyEvent e) {
-				switch (e.getKeyCode()) {
-					case KeyEvent.VK_UP:
-						if (searchPanel != null) searchPanel.up();
-						e.consume();
-						break;
-					case KeyEvent.VK_DOWN:
-						if (searchPanel != null) searchPanel.down();
-						e.consume();
-						break;
-					case KeyEvent.VK_TAB:
-						if (searchPanel != null) searchPanel.requestFocus();
-						e.consume();
-						break;
-					case KeyEvent.VK_ESCAPE:
-						reset();
-						break;
-				}
-			}
-
-		});
+		addKeyListener(new SearchBarKeyAdapter());
 		getDocument().addDocumentListener(new DocumentListener() {
 
 			@Override
@@ -358,12 +335,13 @@ public class SwingSearchBar extends JTextField {
 								reset();								
 							}
 						});
+						button.addKeyListener(new SearchBarKeyAdapter());
 						detailsButtons.add(button);
 					});
 				}
 			});
 			
-			resultsList.addKeyListener(new SearchPanelKeyAdapter());
+			resultsList.addKeyListener(new SearchBarKeyAdapter());
 
 			setLayout(new BorderLayout());
 			setPreferredSize(new Dimension(800, 300));
@@ -510,7 +488,7 @@ public class SwingSearchBar extends JTextField {
 		}
 	}
 	
-	private class SearchPanelKeyAdapter extends KeyAdapter {
+	private class SearchBarKeyAdapter extends KeyAdapter {
 		@Override
 		public void keyPressed(final KeyEvent e) {
 			switch (e.getKeyCode()) {
@@ -520,6 +498,10 @@ public class SwingSearchBar extends JTextField {
 					break;
 				case KeyEvent.VK_DOWN:
 					if (searchPanel != null) searchPanel.down();
+					e.consume();
+					break;
+				case KeyEvent.VK_TAB:
+					if (searchPanel != null) searchPanel.requestFocus();
 					e.consume();
 					break;
 				case KeyEvent.VK_ESCAPE:

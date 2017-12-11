@@ -35,6 +35,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.Window;
 import java.awt.event.FocusEvent;
@@ -55,6 +56,7 @@ import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -65,9 +67,7 @@ import javax.swing.JTextField;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
-import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
-import javax.swing.border.MatteBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
@@ -96,7 +96,7 @@ public class SwingSearchBar extends JTextField {
 	private static final int MAX_RESULTS = 8;
 
 	private static final Color SELECTED_COLOR = new Color(70, 152, 251);
-	private static final Color HEADER_COLOR = new Color(128, 128, 128);
+	private static final Color HEADER_COLOR = new Color(234, 234, 234);
 	private static final int ICON_SIZE = 16;
 	private static final int PAD = 5;
 
@@ -249,6 +249,7 @@ public class SwingSearchBar extends JTextField {
 
 		private final SearchOperation operation;
 		private final Map<Class<?>, SearchEvent> allResults;
+		private final Map<Class<?>, JCheckBox> headerCheckboxes;
 		private final JList<SearchResult> resultsList;
 
 		public SwingSearchPanel() {
@@ -256,18 +257,30 @@ public class SwingSearchBar extends JTextField {
 				event -> threadService.queue(() -> update(event)));
 
 			allResults = new HashMap<>();
+			headerCheckboxes = new HashMap<>();
 
 			resultsList = new JList<>();
 			resultsList.setCellRenderer((list, value, index, isSelected,
 				cellHasFocus) -> {
 				if (isHeader(value)) {
-					final JLabel header = new JLabel(value.name());
-					header.setBorder(new CompoundBorder(//
-						new EmptyBorder(PAD, PAD, 0, PAD),
-						new MatteBorder(0, 0, 1, 0, Color.gray)));
-					header.setBackground(HEADER_COLOR);
-					header.setEnabled(false);
-					return header;
+					final Searcher searcher = ((SearchResultHeader) value).searcher();
+					final JCheckBox headerBox = //
+						new JCheckBox(searcher.title(), searcher.enabled());
+					headerBox.setFont(smaller(headerBox.getFont(), 2));
+					headerBox.setBackground(HEADER_COLOR);
+					headerCheckboxes.put(searcher.getClass(), headerBox);
+
+					final JPanel headerInnerPane = new JPanel();
+					headerInnerPane.setLayout(new GridLayout(1, 1));
+					headerInnerPane.add(headerBox);
+					headerInnerPane.setBackground(HEADER_COLOR);
+
+					final JPanel headerOuterPane = new JPanel();
+					headerOuterPane.setLayout(new GridLayout(1, 1));
+					headerOuterPane.add(headerInnerPane);
+					headerOuterPane.setBackground(list.getBackground());
+					headerOuterPane.setBorder(new EmptyBorder(PAD, 0, 0, 0));
+					return headerOuterPane;
 				}
 				final JPanel item = new JPanel();
 				item.setLayout(new BoxLayout(item, BoxLayout.X_AXIS));
@@ -303,6 +316,16 @@ public class SwingSearchBar extends JTextField {
 				if (lse.getValueIsAdjusting()) return;
 				final SearchResult result = resultsList.getSelectedValue();
 				if (result == null || isHeader(result)) {
+					if (result != null) {
+						final JCheckBox checkBox = headerCheckboxes.get(
+							((SearchResultHeader) result).searcher().getClass());
+						System.out.println("GOT A CHECKBOX: " + checkBox);
+						checkBox.setSelected(!checkBox.isSelected());
+						checkBox.repaint();
+						resultsList.repaint();
+						System.out.println("TOGGLED IT: state -> " + checkBox.isSelected());
+					}
+
 					// clear details pane
 					detailsTitle.setText("");
 					detailsProps.removeAll();
@@ -392,6 +415,10 @@ public class SwingSearchBar extends JTextField {
 			return resultsList.getModel().getSize();
 		}
 
+		private Font smaller(Font font, int decrement) {
+			return new Font(font.getFontName(), font.getStyle(), font.getSize() - decrement);
+		}
+
 		/** Executes the default search action. */
 		private void execute() {
 			assertDispatchThread();
@@ -425,7 +452,7 @@ public class SwingSearchBar extends JTextField {
 					.limit(MAX_RESULTS).collect(Collectors.toList());
 
 				// Add section header.
-				listModel.addElement(new SearchResultHeader(searcher.title()));
+				listModel.addElement(new SearchResultHeader(searcher));
 
 				// Add results as entries.
 				for (final SearchResult result : results) {
@@ -514,15 +541,19 @@ public class SwingSearchBar extends JTextField {
 	/** A header dividing search result entries. */
 	private class SearchResultHeader implements SearchResult {
 
-		private final String title;
+		private final Searcher searcher;
 
-		public SearchResultHeader(final String title) {
-			this.title = title;
+		public SearchResultHeader(final Searcher searcher) {
+			this.searcher = searcher;
+		}
+
+		public Searcher searcher() {
+			return searcher;
 		}
 
 		@Override
 		public String name() {
-			return title;
+			return searcher.title();
 		}
 
 		@Override

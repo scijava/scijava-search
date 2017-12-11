@@ -71,6 +71,12 @@ public interface SearchService extends SingletonService<SearchActionFactory>,
 			.map(factory -> factory.create(result)).collect(Collectors.toList());
 	}
 
+	/** TODO javadoc */
+	boolean enabled(Searcher s);
+
+	/** TODO javadoc */
+	void setEnabled(Searcher s, boolean enabled);
+
 	@Override
 	default Class<SearchActionFactory> getPluginType() {
 		return SearchActionFactory.class;

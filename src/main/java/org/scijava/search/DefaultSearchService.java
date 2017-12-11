@@ -32,7 +32,9 @@
 package org.scijava.search;
 
 import org.scijava.plugin.AbstractSingletonService;
+import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
+import org.scijava.prefs.PrefService;
 import org.scijava.service.Service;
 
 /**
@@ -44,5 +46,18 @@ import org.scijava.service.Service;
 public class DefaultSearchService extends AbstractSingletonService<SearchActionFactory> implements
 	SearchService
 {
-	// NB: No implementation needed.
+	@Parameter
+	private PrefService prefService;
+
+	@Override
+	public boolean enabled(final Searcher s) {
+		final boolean defaultValue = //
+			pluginService().getPlugin(s.getClass()).isEnabled();
+		return prefService.getBoolean(s.getClass(), "enabled", defaultValue);
+	}
+
+	@Override
+	public void setEnabled(final Searcher s, final boolean enabled) {
+		prefService.put(s.getClass(), "enabled", enabled);
+	}
 }

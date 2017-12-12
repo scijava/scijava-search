@@ -8,6 +8,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Scanner;
 
+import org.scijava.log.LogService;
+import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 import org.scijava.search.SearchResult;
 import org.scijava.search.Searcher;
@@ -19,6 +21,9 @@ import org.scijava.search.Searcher;
  */
 @Plugin(type = Searcher.class, name = "ImageJ Forum")
 public class ImageJForumSearcher extends AbstractWebSearcher {
+	
+	@Parameter
+	private LogService logService;
 
 	public ImageJForumSearcher() {
 		super("ImageJ Forum");
@@ -55,8 +60,8 @@ public class ImageJForumSearcher extends AbstractWebSearcher {
 				addResult(metaInfo.get("title"), "", forumPostUrl, details);
 			}
 		}
-		catch (final IOException ex) {
-			ex.printStackTrace();
+		catch (final IOException e) {
+			logService.log().debug(e);
 		}
 		return getSearchResults();
 	}

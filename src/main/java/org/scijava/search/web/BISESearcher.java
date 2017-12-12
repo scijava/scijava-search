@@ -10,6 +10,8 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.scijava.log.LogService;
+import org.scijava.plugin.Parameter;
 import org.scijava.search.SearchResult;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -24,6 +26,9 @@ import org.xml.sax.SAXException;
  */
 //@Plugin(type = Searcher.class, name = "BISE")
 public class BISESearcher extends AbstractWebSearcher {
+	
+	@Parameter
+	private LogService logService;
 
 	public BISESearcher() {
 		super("BISE");
@@ -44,14 +49,14 @@ public class BISESearcher extends AbstractWebSearcher {
 			saveLastItem();
 
 		}
-		catch (final IOException ex) {
-			ex.printStackTrace();
+		catch (final IOException e) {
+			logService.log().debug(e);
 		}
 		catch (final ParserConfigurationException e) {
-			e.printStackTrace();
+			logService.log().debug(e);
 		}
 		catch (final SAXException e) {
-			e.printStackTrace();
+			logService.log().debug(e);
 		}
 		return getSearchResults();
 	}

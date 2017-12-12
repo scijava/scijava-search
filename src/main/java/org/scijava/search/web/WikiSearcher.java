@@ -10,6 +10,8 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.scijava.log.LogService;
+import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 import org.scijava.search.SearchResult;
 import org.scijava.search.Searcher;
@@ -26,6 +28,9 @@ import org.xml.sax.SAXException;
  */
 @Plugin(type = Searcher.class, name = "ImageJ Wiki")
 public class WikiSearcher extends AbstractWebSearcher {
+	
+	@Parameter
+	private LogService logService;
 
 	public WikiSearcher() {
 		super("ImageJ Wiki");
@@ -44,14 +49,14 @@ public class WikiSearcher extends AbstractWebSearcher {
 
 			parse(doc.getDocumentElement());
 		}
-		catch (final IOException ex) {
-			ex.printStackTrace();
+		catch (final IOException e) {
+			logService.log().debug(e);
 		}
 		catch (final ParserConfigurationException e) {
-			e.printStackTrace();
+			logService.log().debug(e);
 		}
 		catch (final SAXException e) {
-			e.printStackTrace();
+			logService.log().debug(e);
 		}
 
 		return getSearchResults();

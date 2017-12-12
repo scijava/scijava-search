@@ -273,7 +273,7 @@ public class SwingSearchBar extends JTextField {
 				if (isHeader(value)) {
 					final Searcher searcher = ((SearchResultHeader) value).searcher();
 					final JCheckBox headerBox = //
-						new JCheckBox(searcher.title(), searcher.enabled());
+						new JCheckBox(searcher.title(), searchService.enabled(searcher));
 					headerBox.setFont(smaller(headerBox.getFont(), 2));
 					headerBox.setBackground(HEADER_COLOR);
 					headerCheckboxes.put(searcher.getClass(), headerBox);
@@ -322,13 +322,9 @@ public class SwingSearchBar extends JTextField {
 				final SearchResult result = resultsList.getSelectedValue();
 				if (result == null || isHeader(result)) {
 					if (result != null) {
-						final JCheckBox checkBox = headerCheckboxes.get(
-							((SearchResultHeader) result).searcher().getClass());
-						System.out.println("GOT A CHECKBOX: " + checkBox);
-						checkBox.setSelected(!checkBox.isSelected());
-						checkBox.repaint();
-						resultsList.repaint();
-						System.out.println("TOGGLED IT: state -> " + checkBox.isSelected());
+						final Searcher searcher = ((SearchResultHeader) result).searcher();
+						searchService.setEnabled(searcher, !searchService.enabled(searcher));
+						SwingSearchBar.this.search();
 					}
 
 					// clear details pane
@@ -472,14 +468,15 @@ public class SwingSearchBar extends JTextField {
 				// Look up the results list.
 				final List<SearchResult> completeResults = //
 					allResults.get(searcher.getClass()).results();
+				
+				// Add section header.
+				listModel.addElement(new SearchResultHeader(searcher));
+				
 				if (completeResults.isEmpty()) continue;
 
 				// Limit to the top MAX_RESULTS matches only.
 				final List<SearchResult> results = completeResults.stream() //
 					.limit(MAX_RESULTS).collect(Collectors.toList());
-
-				// Add section header.
-				listModel.addElement(new SearchResultHeader(searcher));
 
 				// Add results as entries.
 				for (final SearchResult result : results) {

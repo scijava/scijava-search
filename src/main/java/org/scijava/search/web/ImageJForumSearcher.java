@@ -4,12 +4,15 @@ package org.scijava.search.web;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Scanner;
 
+import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 import org.scijava.search.SearchResult;
+import org.scijava.search.SearchService;
 import org.scijava.search.Searcher;
 
 /**
@@ -19,6 +22,9 @@ import org.scijava.search.Searcher;
  */
 @Plugin(type = Searcher.class, name = "ImageJ Forum")
 public class ImageJForumSearcher extends AbstractWebSearcher {
+	
+	@Parameter
+	private SearchService searchService;
 
 	public ImageJForumSearcher() {
 		super("ImageJ Forum");
@@ -26,6 +32,7 @@ public class ImageJForumSearcher extends AbstractWebSearcher {
 
 	@Override
 	public List<SearchResult> search(final String text, final boolean fuzzy) {
+		if(!searchService.enabled(this)) return new ArrayList<>();
 		try {
 			final URL url = new URL("http://forum.imagej.net/search?q=" + URLEncoder
 				.encode(text) + "&source=imagej");

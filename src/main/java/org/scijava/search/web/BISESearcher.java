@@ -4,13 +4,16 @@ package org.scijava.search.web;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.scijava.plugin.Parameter;
 import org.scijava.search.SearchResult;
+import org.scijava.search.SearchService;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -24,6 +27,9 @@ import org.xml.sax.SAXException;
  */
 //@Plugin(type = Searcher.class, name = "BISE")
 public class BISESearcher extends AbstractWebSearcher {
+	
+	@Parameter
+	private SearchService searchService;
 
 	public BISESearcher() {
 		super("BISE");
@@ -31,6 +37,9 @@ public class BISESearcher extends AbstractWebSearcher {
 
 	@Override
 	public List<SearchResult> search(final String text, final boolean fuzzy) {
+		
+		if(!searchService.enabled(this)) return new ArrayList<>();
+		
 		try {
 			// URL url = new URL("file:///c:/structure/temp/biii.eu_search2.html");
 			final URL url = new URL("http://biii.eu/search?search_api_fulltext=" +

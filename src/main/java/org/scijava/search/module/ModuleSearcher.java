@@ -31,7 +31,6 @@
 
 package org.scijava.search.module;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -43,7 +42,6 @@ import org.scijava.module.ModuleService;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 import org.scijava.search.SearchResult;
-import org.scijava.search.SearchService;
 import org.scijava.search.Searcher;
 
 /**
@@ -62,9 +60,6 @@ public class ModuleSearcher implements Searcher {
 
 	@Parameter
 	private AppService appService;
-	
-	@Parameter
-	private SearchService searchService;
 
 	@Override
 	public String title() {
@@ -74,7 +69,6 @@ public class ModuleSearcher implements Searcher {
 
 	@Override
 	public List<SearchResult> search(final String text, final boolean fuzzy) {
-		if(!searchService.enabled(this)) return new ArrayList<>();
 		final String baseDir = //
 			appService.getApp().getBaseDirectory().getAbsolutePath();
 		return moduleService.getModules().stream() //

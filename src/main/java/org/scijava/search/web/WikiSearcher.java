@@ -4,17 +4,14 @@ package org.scijava.search.web;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 import org.scijava.search.SearchResult;
-import org.scijava.search.SearchService;
 import org.scijava.search.Searcher;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -29,9 +26,6 @@ import org.xml.sax.SAXException;
  */
 @Plugin(type = Searcher.class, name = "ImageJ Wiki")
 public class WikiSearcher extends AbstractWebSearcher {
-	
-	@Parameter
-	private SearchService searchService;
 
 	public WikiSearcher() {
 		super("ImageJ Wiki");
@@ -39,7 +33,6 @@ public class WikiSearcher extends AbstractWebSearcher {
 
 	@Override
 	public List<SearchResult> search(final String text, final boolean fuzzy) {
-		if(!searchService.enabled(this)) return new ArrayList<>();
 		try {
 			final URL url = new URL(
 				"http://imagej.net/index.php?title=Special%3ASearch&search=" +

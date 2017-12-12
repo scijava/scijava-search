@@ -26,6 +26,9 @@ public class DefaultSearchOperation implements SearchOperation {
 	private final List<SearchAttempt> currentSearches = new ArrayList<>();
 
 	@Parameter
+	private SearchService searchService;
+
+	@Parameter
 	private PluginService pluginService;
 
 	@Parameter
@@ -127,7 +130,10 @@ public class DefaultSearchOperation implements SearchOperation {
 		@Override
 		public void run() {
 			final boolean exclusive = searcher.exclusive(query);
-			final List<SearchResult> results = searcher.search(query, fuzzy);
+			final boolean enabled = searchService.enabled(searcher);
+			if (!valid) return;
+			final List<SearchResult> results = enabled ? //
+				searcher.search(query, fuzzy) : Collections.emptyList();
 			if (!valid) return;
 			for (final SearchListener l : listeners) {
 				l.searchCompleted(new SearchEvent(searcher, results, exclusive));

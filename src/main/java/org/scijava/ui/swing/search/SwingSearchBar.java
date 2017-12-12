@@ -555,6 +555,10 @@ public class SwingSearchBar extends JTextField {
 					if (searchPanel != null) searchPanel.requestFocus();
 					e.consume();
 					break;
+				case KeyEvent.VK_ENTER:
+					if (searchPanel != null) run();
+					e.consume();
+					break;
 				case KeyEvent.VK_ESCAPE:
 					reset();
 					break;

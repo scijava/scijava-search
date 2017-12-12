@@ -213,12 +213,13 @@ public class SwingSearchBar extends JTextField {
 		}
 		searchPanel.search(getText());
 		if (!dialog.isVisible()) {
-			dialog.setFocusableWindowState(false);
-			dialog.setVisible(true);
-			dialog.setFocusableWindowState(true);
-			SwingUtilities.getWindowAncestor(this).requestFocusInWindow();
-			grabFocus();
-			requestFocus();
+			threadService.queue(() -> {
+				dialog.setVisible(true);
+				try { Thread.sleep(100); }
+				catch (InterruptedException exc) {}
+				grabFocus();
+				requestFocus();
+			});
 		}
 	}
 

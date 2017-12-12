@@ -231,24 +231,17 @@ public class SwingSearchBar extends JTextField {
 
 	private void reset() {
 		assertDispatchThread();
-		if (dialog != null) {
+		if (dialog == null) loseFocus();
+		else {
 			searchPanel = null;
 			dialog.dispose();
 			dialog = null;
-		}else{
-			SwingUtilities.getWindowAncestor(this).requestFocusInWindow();
 		}
-		if (!getText().isEmpty()) setText("");
-		else {
-			// lose the focus!
-			loseFocus();
-//			Toolbar.getInstance().requestFocus();
-		}
+		setText("");
 	}
 
 	private void loseFocus() {
-		assertDispatchThread();
-		// NB: Default action: do nothing.
+		SwingUtilities.getWindowAncestor(this).requestFocusInWindow();
 	}
 
 	// -- Helper classes --

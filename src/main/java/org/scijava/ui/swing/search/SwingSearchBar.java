@@ -51,6 +51,7 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
@@ -61,6 +62,7 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.JRootPane;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTextField;
@@ -304,19 +306,16 @@ public class SwingSearchBar extends JTextField {
 
 			final JPanel detailsPane = new JPanel();
 			final JLabel detailsTitle = new JLabel();
-			detailsTitle.setHorizontalAlignment(SwingConstants.CENTER);
+			detailsTitle.setHorizontalAlignment(SwingConstants.LEFT);
 			final JPanel detailsProps = new JPanel();
 			final JPanel detailsButtons = new JPanel();
 			detailsButtons.setLayout(new BoxLayout(detailsButtons, BoxLayout.X_AXIS));
-			detailsTitle.setAlignmentX(0.5f);
-			detailsProps.setAlignmentX(0.5f);
-			detailsButtons.setAlignmentX(0.5f);
 
-			detailsPane.setLayout(new BoxLayout(detailsPane, BoxLayout.Y_AXIS));
+			detailsPane.setLayout(new MigLayout("wrap","[grow]", "[][grow][]"));
+			detailsPane.setBorder(BorderFactory.createEmptyBorder(PAD, PAD, PAD, PAD));
 			detailsPane.add(detailsTitle);
-			detailsPane.add(detailsProps);
-			detailsPane.add(detailsButtons);
-			detailsPane.add(Box.createVerticalGlue());
+			detailsPane.add(detailsProps, "grow,span");
+			detailsPane.add(detailsButtons, "grow");
 
 			resultsList.addListSelectionListener(lse -> {
 				if (lse.getValueIsAdjusting()) return;
@@ -341,40 +340,54 @@ public class SwingSearchBar extends JTextField {
 					// populate details pane
 					detailsTitle.setText("<html><h2>" + result.name() + "</h2>");
 					detailsProps.removeAll();
-					detailsProps.setLayout(new MigLayout("fillx,wrap 2", "[200px|pref]", "pref"));
+					detailsProps.setLayout(new MigLayout("wrap 2, ins 0", "[123!][grow]", "pref"));
 					result.properties().forEach((k, v) -> {
 						if (k == null) {
 							final JTextPane textPane = new JTextPane();
 							textPane.setContentType("text/html");
 							textPane.setText(v);
-							detailsProps.add(textPane, "span 2");
+							textPane.setMargin(null);
+							textPane.setEditable(false);
+							textPane.setOpaque(false);
+							detailsProps.add(textPane, "span 2, grow");
 						}
 						else {
 							final JLabel keyLabel = new JLabel("<html>" +
-								"<strong style=\"color: gray; padding-right: 5px\">" + k +
-								"&nbsp;&nbsp;</strong>", SwingConstants.RIGHT);
-							detailsProps.add(keyLabel);
+								"<strong style=\"color: gray;\">" + k +
+								"&nbsp;&nbsp;</strong>");
+							keyLabel.setHorizontalAlignment( RIGHT );
+							detailsProps.add(keyLabel, "grow");
 							final JTextField valueField = new JTextField();
 							valueField.setText(v);
 							valueField.setEditable(false);
 							valueField.setBackground(null);
 							valueField.setBorder(null);
-							detailsProps.add(valueField);
+							detailsProps.add(valueField, "grow");
 						}
 					});
 					detailsButtons.removeAll();
 					final List<SearchAction> actions = searchService.actions(result);
-					actions.forEach(action -> {
+					boolean first = true;
+					for(SearchAction action : actions){
+						if(!first){
+							detailsButtons.add(Box.createHorizontalStrut(5));
+						}
 						final JButton button = new JButton(action.toString());
 						button.addActionListener(ae -> {
 							action.run();
 							if(action.willCloseSearch()){
-								reset();								
+								reset();
 							}
 						});
 						button.addKeyListener(new SearchBarKeyAdapter());
 						detailsButtons.add(button);
-					});
+						if(first){
+							JRootPane rootPane = this.getRootPane();
+							rootPane.setDefaultButton(button);
+							detailsButtons.add(Box.createHorizontalGlue());
+							first = false;
+						}
+					}
 				}
 			});
 			

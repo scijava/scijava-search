@@ -43,9 +43,9 @@ public class WebSearchResult implements SearchResult {
 	public Map<String, String> properties() {
 		final HashMap<String, String> properties = new HashMap<>();
 		properties.put("name", name);
-		properties.put("iconpath", iconPath);
+//		properties.put("iconpath", iconPath);
 		properties.put("url", url);
-		properties.put("details", details);
+		properties.put(null, "<body style='font-size: 11pt; font-family: Arial; background-color: #f4f4f7; padding: 10px 5px;'>.. " + details + " ..</body>");
 		return properties;
 	}
 }

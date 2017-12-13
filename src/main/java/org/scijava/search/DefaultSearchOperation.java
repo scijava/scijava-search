@@ -130,10 +130,11 @@ public class DefaultSearchOperation implements SearchOperation {
 		@Override
 		public void run() {
 			final boolean exclusive = searcher.exclusive(query);
+			final boolean supported = searcher.supports(query);
 			final boolean enabled = searchService.enabled(searcher);
 			if (!valid) return;
-			final List<SearchResult> results = enabled ? //
-				searcher.search(query, fuzzy) : Collections.emptyList();
+			final List<SearchResult> results = supported ? (enabled ? //
+				searcher.search(query, fuzzy) : Collections.emptyList()) : null;
 			if (!valid) return;
 			for (final SearchListener l : listeners) {
 				l.searchCompleted(new SearchEvent(searcher, results, exclusive));

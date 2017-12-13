@@ -463,6 +463,8 @@ public class SwingSearchBar extends JTextField {
 				final List<SearchResult> completeResults = //
 					allResults.get(searcher.getClass()).results();
 				
+				if (completeResults == null) continue;
+				
 				// Add section header.
 				listModel.addElement(new SearchResultHeader(searcher));
 				

@@ -26,6 +26,11 @@ public interface Searcher extends SciJavaPlugin {
 	default boolean enabled() {
 		return true;
 	}
+	
+	/** Whether this plugin supports a search of this term. */
+	default boolean supports(String term) {
+		return true;
+	}
 
 	/** Gets whether this plugin wants exclusive rights to the given text. */
 	default boolean exclusive(@SuppressWarnings("unused") final String text) {

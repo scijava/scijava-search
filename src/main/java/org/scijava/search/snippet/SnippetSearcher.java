@@ -64,6 +64,11 @@ public class SnippetSearcher implements Searcher {
 		// NB: A misnomer, but it's the term users are familiar with.
 		return "Code snippets";
 	}
+	
+	@Override
+	public boolean supports(final String text) {
+		return text.startsWith("#!") || text.startsWith("!");
+	}
 
 	@Override
 	public boolean exclusive(final String text) {

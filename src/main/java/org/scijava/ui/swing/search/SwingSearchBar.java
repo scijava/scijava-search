@@ -528,7 +528,7 @@ public class SwingSearchBar extends JTextField {
 
 		private boolean isFirstNonHeader(final int index) {
 			assertDispatchThread();
-			for (int i = index; i >= 0; i--) {
+			for (int i = index-1; i >= 0; i--) {
 				if (!isHeader(result(i))) return false;
 			}
 			return true;

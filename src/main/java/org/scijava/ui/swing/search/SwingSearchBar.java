@@ -32,6 +32,7 @@ package org.scijava.ui.swing.search;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
@@ -56,7 +57,6 @@ import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -68,6 +68,8 @@ import javax.swing.JTextPane;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
+import javax.swing.border.Border;
+import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -93,6 +95,7 @@ import org.scijava.thread.ThreadService;
  *
  * @author Curtis Rueden
  */
+
 public class SwingSearchBar extends JTextField {
 
 	private static final String DEFAULT_MESSAGE = "Click here to search";
@@ -100,6 +103,7 @@ public class SwingSearchBar extends JTextField {
 
 	private static final Color SELECTED_COLOR = new Color(70, 152, 251);
 	private static final Color HEADER_COLOR = new Color(234, 234, 234);
+	private static final Color PANEL_COLOR = new Color(77, 77, 77);
 	private static final int ICON_SIZE = 16;
 	private static final int PAD = 5;
 
@@ -112,14 +116,19 @@ public class SwingSearchBar extends JTextField {
 	@Parameter
 	private PluginService pluginService;
 
-	private final Window parent;
-	private JDialog dialog;
+	private final Window window;
+	private final Container parent;
 	private SwingSearchPanel searchPanel;
 
-	public SwingSearchBar(final Context context, final Window parent) {
+	public SwingSearchBar(final Context context, final Window window, final Container parent) {
 		super(DEFAULT_MESSAGE, 12);
 		this.parent = parent;
+		this.window = window;
 		context.inject(this);
+		
+		setBorder(BorderFactory.createCompoundBorder(
+				BorderFactory.createLineBorder(new Color(237,237,237), 5), 
+				BorderFactory.createEmptyBorder(5,5,5,5)));
 
 		addActionListener(e -> run());
 		addKeyListener(new SearchBarKeyAdapter());
@@ -193,32 +202,28 @@ public class SwingSearchBar extends JTextField {
 	/** Called whenever the user types something. */
 	private void search() {
 		assertDispatchThread();
-		if (dialog == null) {
+		if (searchPanel == null) {
 			if (getText().equals("") || getText().equals(DEFAULT_MESSAGE)) {
 				// NB: Defer creating a new search dialog until something is typed.
 				return;
 			}
 
-			dialog = new JDialog(parent, "Quick Search");
 			searchPanel = new SwingSearchPanel(); // Spawns the SearchOperation!
-			dialog.setContentPane(searchPanel);
-			dialog.pack();
-
-			// position below the parent window
-			final int x = parent.getLocation().x;
-			final int y = parent.getLocation().y + parent.getHeight() + 1;
-			dialog.setLocation(x, y);
-		}
-		searchPanel.search(getText());
-		if (!dialog.isVisible()) {
+			searchPanel.setBorder(BorderFactory.createEmptyBorder(0,5,0,5));
+			parent.add(searchPanel, "south,height 300!", getParent().getComponentCount()-1);
+			parent.doLayout();
+			parent.revalidate();
+			parent.repaint();
+			window.pack();
 			threadService.queue(() -> {
-				dialog.setVisible(true);
+				searchPanel.setVisible(true);
 				try { Thread.sleep(100); }
 				catch (InterruptedException exc) {}
 				grabFocus();
 				requestFocus();
 			});
 		}
+		searchPanel.search(getText());
 	}
 
 	/** Called when the user hits ENTER. */
@@ -230,11 +235,17 @@ public class SwingSearchBar extends JTextField {
 
 	private void reset() {
 		assertDispatchThread();
-		if (dialog == null) loseFocus();
+		if (searchPanel == null) loseFocus();
 		else {
-			searchPanel = null;
-			dialog.dispose();
-			dialog = null;
+			threadService.queue(() -> {
+				parent.remove(searchPanel);
+				parent.revalidate();
+				parent.repaint(50L);
+				window.revalidate();
+				window.pack();
+				window.repaint(50L);
+				searchPanel = null;
+			});
 		}
 		setText("");
 	}
@@ -291,17 +302,19 @@ public class SwingSearchBar extends JTextField {
 				item.setBackground(isSelected ? SELECTED_COLOR : list.getBackground());
 				return item;
 			});
-			resultsList.setBorder(new EmptyBorder(0, 0, PAD, 0));
+			resultsList.setBorder(new EmptyBorder(0, 0, 0, 0));
 			final JScrollPane resultsPane = new JScrollPane(resultsList);
 			resultsPane.setHorizontalScrollBarPolicy(
 				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+			resultsPane.setBorder(BorderFactory.createEmptyBorder());
+			resultsPane.setBackground(PANEL_COLOR);
 
 			final JPanel detailsPane = new JPanel();
 			final JLabel detailsTitle = new JLabel();
 			detailsTitle.setHorizontalAlignment(SwingConstants.LEFT);
 			final JPanel detailsProps = new JPanel();
 			final JPanel detailsButtons = new JPanel();
-			detailsButtons.setLayout(new BoxLayout(detailsButtons, BoxLayout.X_AXIS));
+			detailsButtons.setLayout(new MigLayout());
 
 			detailsPane.setLayout(new MigLayout("wrap","[grow]", "[][grow][]"));
 			detailsPane.setBorder(BorderFactory.createEmptyBorder(PAD, PAD, PAD, PAD));
@@ -368,12 +381,18 @@ public class SwingSearchBar extends JTextField {
 							}
 						});
 						button.addKeyListener(new SearchBarKeyAdapter());
-						detailsButtons.add(button);
 						if(first){
+							Border border = new CompoundBorder(new EmptyBorder(5,0,0,0), button.getBorder());
+							button.setBorder(border);
+							detailsButtons.add(button, "south");
 							JRootPane rootPane = this.getRootPane();
-							rootPane.setDefaultButton(button);
-							detailsButtons.add(Box.createHorizontalGlue());
+							if(rootPane != null){
+								rootPane.setDefaultButton(button);
+							}
+//							detailsButtons.add(Box.createHorizontalGlue());
 							first = false;
+						}else{
+							detailsButtons.add(button, "growx");
 						}
 					}
 				}
@@ -383,12 +402,16 @@ public class SwingSearchBar extends JTextField {
 
 			setLayout(new BorderLayout());
 			setPreferredSize(new Dimension(800, 300));
+			setBorder(BorderFactory.createEmptyBorder());
 
+//			Border border = new CompoundBorder(new LineBorder(PANEL_COLOR, 1), new LineBorder(new Color(33,33,33), 5));
+//			UIManager.put("SplitPaneDivider.border", border);
 			final JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
 			splitPane.setLeftComponent(resultsPane);
-			splitPane.setRightComponent(detailsPane);
+			splitPane.setRightComponent(detailsPane); 
+			splitPane.setDividerLocation(0.3);
+			splitPane.setBorder(BorderFactory.createEmptyBorder());
 			add(splitPane, BorderLayout.CENTER);
-			
 		}
 
 		public void search(final String text) {
@@ -480,8 +503,9 @@ public class SwingSearchBar extends JTextField {
 			resultsList.setModel(listModel);
 
 			// TODO: Improve retainment of previous selection.
-			if (previous == null) resultsList.setSelectedIndex(firstResultIndex());
-			else resultsList.setSelectedValue(previous, true);
+			// TODO check why this crashes with nullpointer
+//			if (previous == null) resultsList.setSelectedIndex(firstResultIndex());
+//			else resultsList.setSelectedValue(previous, true);
 		}
 
 		private Component icon(final String iconPath) {

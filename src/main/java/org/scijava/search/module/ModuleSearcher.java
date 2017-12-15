@@ -29,6 +29,7 @@
 
 package org.scijava.search.module;
 
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -69,18 +70,28 @@ public class ModuleSearcher implements Searcher {
 	public List<SearchResult> search(final String text, final boolean fuzzy) {
 		final String baseDir = //
 			appService.getApp().getBaseDirectory().getAbsolutePath();
-		return moduleService.getModules().stream() //
-			.filter(info -> matches(info, text)) //
+
+		final LinkedHashSet<ModuleInfo> matches = new LinkedHashSet<>();
+
+		final List<ModuleInfo> modules = moduleService.getModules();
+
+		// Add modules with matching titles first.
+		modules.stream() //
+			.filter(info -> matches(info.getTitle(), text)) //
+			.forEach(matches::add);
+
+		// Add modules with matching menu paths after that.
+		modules.stream() //
+			.filter(info -> matches(info.getMenuPath().toString(), text)) //
+			.forEach(matches::add);
+
+		// Wrap each matching ModuleInfo in a ModuleSearchResult.
+		return matches.stream() //
 			.map(info -> new ModuleSearchResult(info, baseDir)) //
 			.collect(Collectors.toList());
 	}
 
 	// -- Helper methods --
-
-	private boolean matches(final ModuleInfo info, final String text) {
-		return matches(info.getMenuPath().toString(), text) ||
-			matches(info.getTitle(), text);
-	}
 
 	private boolean matches(final String actual, final String desired) {
 		// TODO: Implement fuzzy matching option, and maybe case sensitive option.

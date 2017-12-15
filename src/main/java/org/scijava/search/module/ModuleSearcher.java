@@ -75,14 +75,16 @@ public class ModuleSearcher implements Searcher {
 
 		final List<ModuleInfo> modules = moduleService.getModules();
 
+		final String textLower = text.toLowerCase();
+
 		// Add modules with matching titles first.
 		modules.stream() //
-			.filter(info -> matches(info.getTitle(), text)) //
+			.filter(info -> matches(info.getTitle(), textLower)) //
 			.forEach(matches::add);
 
 		// Add modules with matching menu paths after that.
 		modules.stream() //
-			.filter(info -> matches(info.getMenuPath().toString(), text)) //
+			.filter(info -> matches(info.getMenuPath().toString(), textLower)) //
 			.forEach(matches::add);
 
 		// Wrap each matching ModuleInfo in a ModuleSearchResult.

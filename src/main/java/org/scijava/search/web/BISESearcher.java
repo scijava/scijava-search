@@ -56,7 +56,7 @@ import org.xml.sax.SAXException;
 public class BISESearcher extends AbstractWebSearcher {
 	
 	@Parameter
-	private LogService logService;
+	private LogService log;
 
 	public BISESearcher() {
 		super("BISE");
@@ -75,16 +75,15 @@ public class BISESearcher extends AbstractWebSearcher {
 
 			parse(doc.getDocumentElement());
 			saveLastItem();
-
 		}
 		catch (final IOException e) {
-			logService.log().debug(e);
+			log.debug(e);
 		}
 		catch (final ParserConfigurationException e) {
-			logService.log().debug(e);
+			log.debug(e);
 		}
 		catch (final SAXException e) {
-			logService.log().debug(e);
+			log.debug(e);
 		}
 		return getSearchResults();
 	}

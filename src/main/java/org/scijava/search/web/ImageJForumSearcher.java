@@ -51,7 +51,7 @@ import org.scijava.search.Searcher;
 public class ImageJForumSearcher extends AbstractWebSearcher {
 	
 	@Parameter
-	private LogService logService;
+	private LogService log;
 
 	public ImageJForumSearcher() {
 		super("ImageJ Forum");
@@ -89,7 +89,7 @@ public class ImageJForumSearcher extends AbstractWebSearcher {
 			}
 		}
 		catch (final IOException e) {
-			logService.log().debug(e);
+			log.debug(e);
 		}
 		return getSearchResults();
 	}

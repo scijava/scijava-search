@@ -58,7 +58,7 @@ import org.xml.sax.SAXException;
 public class WikiSearcher extends AbstractWebSearcher {
 	
 	@Parameter
-	private LogService logService;
+	private LogService log;
 
 	public WikiSearcher() {
 		super("ImageJ Wiki");
@@ -78,13 +78,13 @@ public class WikiSearcher extends AbstractWebSearcher {
 			parse(doc.getDocumentElement());
 		}
 		catch (final IOException e) {
-			logService.log().debug(e);
+			log.debug(e);
 		}
 		catch (final ParserConfigurationException e) {
-			logService.log().debug(e);
+			log.debug(e);
 		}
 		catch (final SAXException e) {
-			logService.log().debug(e);
+			log.debug(e);
 		}
 
 		return getSearchResults();

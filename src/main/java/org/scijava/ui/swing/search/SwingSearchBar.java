@@ -37,12 +37,10 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.Window;
-import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.beans.PropertyChangeListener;
 import java.net.URL;
 import java.util.Collections;
 import java.util.Comparator;
@@ -102,6 +100,9 @@ public class SwingSearchBar extends JTextField {
 
 	private static final String DEFAULT_MESSAGE = "Click here to search";
 	private static final int MAX_RESULTS = 8;
+	
+	private static final Color SEARCHBAR_FONT_COLOR = new Color(0, 0, 0);
+	private static final Color SEARCHBAR_FONT_DEFAULT_COLOR = new Color(150, 150, 150);
 
 	private static final Color SELECTED_COLOR = new Color(70, 152, 251);
 	private static final Color HEADER_COLOR = new Color(234, 234, 234);
@@ -123,6 +124,8 @@ public class SwingSearchBar extends JTextField {
 	private SwingSearchPanel searchPanel;
 	
 	private DocumentListener documentListener;
+	
+	private final JButton exitBtn;
 
 	public SwingSearchBar(final Context context, final Window window, final Container parent) {
 		super(DEFAULT_MESSAGE, 12);
@@ -130,9 +133,10 @@ public class SwingSearchBar extends JTextField {
 		this.window = window;
 		context.inject(this);
 		setText(DEFAULT_MESSAGE);
+		setForeground(SEARCHBAR_FONT_DEFAULT_COLOR);
 		
 		setBorder(BorderFactory.createCompoundBorder(
-				BorderFactory.createLineBorder(new Color(237,237,237), 5), 
+				BorderFactory.createEmptyBorder(), 
 				BorderFactory.createEmptyBorder(5,5,5,5)));
 
 		addActionListener(e -> run());
@@ -161,14 +165,24 @@ public class SwingSearchBar extends JTextField {
 			@Override
 			public void focusGained(final FocusEvent e) {
 				if (DEFAULT_MESSAGE.equals(getText())) setText("");
-				setForeground(new Color(0,0,0));
+				setForeground(SEARCHBAR_FONT_COLOR);
 			}
 
 			@Override
 			public void focusLost(final FocusEvent e) {
-				if (getText().equals("")) reset();
+				if (getText().equals("")) {
+					reset();
+				}
 			}
 
+		});
+		
+		exitBtn = new JButton("🞩");
+		exitBtn.setBackground(new Color(255,255,255));
+		exitBtn.setBorder(BorderFactory.createLineBorder(new Color(255,255,255),5));
+		exitBtn.addActionListener(ae -> {
+			reset();
+			loseFocus();
 		});
 	}
 
@@ -216,7 +230,6 @@ public class SwingSearchBar extends JTextField {
 			}
 
 			searchPanel = new SwingSearchPanel(); // Spawns the SearchOperation!
-			searchPanel.setBorder(BorderFactory.createEmptyBorder(0,5,0,5));
 			parent.add(searchPanel, "south,height 300!", getParent().getComponentCount()-1);
 			parent.doLayout();
 			parent.revalidate();
@@ -246,7 +259,7 @@ public class SwingSearchBar extends JTextField {
 			loseFocus();
 			getDocument().removeDocumentListener(documentListener);
 			setText(DEFAULT_MESSAGE);
-			setForeground(new Color(150,150,150));
+			setForeground(SEARCHBAR_FONT_DEFAULT_COLOR);
 			getDocument().addDocumentListener(documentListener);
 		}
 		else {
@@ -303,7 +316,7 @@ public class SwingSearchBar extends JTextField {
 					headerOuterPane.setLayout(new GridLayout(1, 1));
 					headerOuterPane.add(headerInnerPane);
 					headerOuterPane.setBackground(list.getBackground());
-					headerOuterPane.setBorder(new EmptyBorder(PAD, 0, 0, 0));
+					headerOuterPane.setBorder(new EmptyBorder(index == 0? 0 : PAD, 0, 0, 0));
 					return headerOuterPane;
 				}
 				final JPanel item = new JPanel();
@@ -329,8 +342,10 @@ public class SwingSearchBar extends JTextField {
 			final JPanel detailsButtons = new JPanel();
 			detailsButtons.setLayout(new MigLayout());
 
-			detailsPane.setLayout(new MigLayout("wrap","[grow]", "[][grow][]"));
-			detailsPane.setBorder(BorderFactory.createEmptyBorder(PAD, PAD, PAD, PAD));
+			detailsPane.setLayout(new MigLayout("wrap, ins 0","[grow]", "[][grow][]"));
+			detailsPane.setBorder(null);
+			
+			detailsPane.add(exitBtn, "push, al right, wrap");
 			detailsPane.add(detailsTitle);
 			detailsPane.add(detailsProps, "grow,span");
 			detailsPane.add(detailsButtons, "grow");

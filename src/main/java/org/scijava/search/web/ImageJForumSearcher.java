@@ -62,14 +62,15 @@ public class ImageJForumSearcher extends AbstractWebSearcher {
 		try {
 			final URL url = new URL("http://forum.imagej.net/search?q=" + //
 				URLEncoder.encode(text, "utf-8") + "&source=imagej");
-			final Scanner s = new Scanner(url.openStream());
-			s.useDelimiter("\"topics\":");
-
 			String webSearchContent;
-			if (!s.hasNext()) return getSearchResults();
-			s.next();
-			if (!s.hasNext()) return getSearchResults();
-			webSearchContent = s.next();
+			try (final Scanner s = new Scanner(url.openStream())) {
+				s.useDelimiter("\"topics\":");
+
+				if (!s.hasNext()) return getSearchResults();
+				s.next();
+				if (!s.hasNext()) return getSearchResults();
+				webSearchContent = s.next();
+			}
 			webSearchContent = webSearchContent.substring(webSearchContent.indexOf(
 				"[{") + 2, webSearchContent.indexOf("}]"));
 

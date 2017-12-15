@@ -37,10 +37,12 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.Window;
+import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.beans.PropertyChangeListener;
 import java.net.URL;
 import java.util.Collections;
 import java.util.Comparator;
@@ -119,12 +121,15 @@ public class SwingSearchBar extends JTextField {
 	private final Window window;
 	private final Container parent;
 	private SwingSearchPanel searchPanel;
+	
+	private DocumentListener documentListener;
 
 	public SwingSearchBar(final Context context, final Window window, final Container parent) {
 		super(DEFAULT_MESSAGE, 12);
 		this.parent = parent;
 		this.window = window;
 		context.inject(this);
+		setText(DEFAULT_MESSAGE);
 		
 		setBorder(BorderFactory.createCompoundBorder(
 				BorderFactory.createLineBorder(new Color(237,237,237), 5), 
@@ -132,7 +137,7 @@ public class SwingSearchBar extends JTextField {
 
 		addActionListener(e -> run());
 		addKeyListener(new SearchBarKeyAdapter());
-		getDocument().addDocumentListener(new DocumentListener() {
+		documentListener = new DocumentListener() {
 
 			@Override
 			public void insertUpdate(final DocumentEvent e) {
@@ -149,12 +154,14 @@ public class SwingSearchBar extends JTextField {
 				search();
 			}
 
-		});
+		};
+		getDocument().addDocumentListener(documentListener);
 		addFocusListener(new FocusListener() {
 
 			@Override
 			public void focusGained(final FocusEvent e) {
 				if (DEFAULT_MESSAGE.equals(getText())) setText("");
+				setForeground(new Color(0,0,0));
 			}
 
 			@Override
@@ -213,8 +220,8 @@ public class SwingSearchBar extends JTextField {
 			parent.add(searchPanel, "south,height 300!", getParent().getComponentCount()-1);
 			parent.doLayout();
 			parent.revalidate();
-			parent.repaint();
 			window.pack();
+			parent.repaint();
 			threadService.queue(() -> {
 				searchPanel.setVisible(true);
 				try { Thread.sleep(100); }
@@ -235,19 +242,25 @@ public class SwingSearchBar extends JTextField {
 
 	private void reset() {
 		assertDispatchThread();
-		if (searchPanel == null) loseFocus();
+		if (searchPanel == null){
+			loseFocus();
+			getDocument().removeDocumentListener(documentListener);
+			setText(DEFAULT_MESSAGE);
+			setForeground(new Color(150,150,150));
+			getDocument().addDocumentListener(documentListener);
+		}
 		else {
 			threadService.queue(() -> {
 				parent.remove(searchPanel);
 				parent.revalidate();
-				parent.repaint(50L);
+				parent.repaint();
 				window.revalidate();
 				window.pack();
-				window.repaint(50L);
+				window.repaint();
 				searchPanel = null;
 			});
+			setText("");
 		}
-		setText("");
 	}
 
 	private void loseFocus() {

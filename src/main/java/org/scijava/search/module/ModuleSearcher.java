@@ -77,12 +77,17 @@ public class ModuleSearcher implements Searcher {
 
 		final String textLower = text.toLowerCase();
 
-		// Add modules with matching titles first.
+		// First, add modules where title starts with the text.
+		modules.stream() //
+			.filter(info -> info.getTitle().startsWith(textLower)) //
+			.forEach(matches::add);
+
+		// Next, add modules where title has text inside somewhere.
 		modules.stream() //
 			.filter(info -> matches(info.getTitle(), textLower)) //
 			.forEach(matches::add);
 
-		// Add modules with matching menu paths after that.
+		// Finally, add modules where menu path has text inside somewhere.
 		modules.stream() //
 			.filter(info -> matches(info.getMenuPath().toString(), textLower)) //
 			.forEach(matches::add);

@@ -69,7 +69,7 @@ public class WikiSearcher extends AbstractWebSearcher {
 		try {
 			final URL url = new URL(
 				"http://imagej.net/index.php?title=Special%3ASearch&search=" +
-					URLEncoder.encode(text) + "&go=Search&source=imagej");
+					URLEncoder.encode(text, "utf-8") + "&go=Search&source=imagej");
 
 			final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 			final DocumentBuilder db = dbf.newDocumentBuilder();

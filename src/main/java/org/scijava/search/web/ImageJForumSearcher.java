@@ -60,8 +60,8 @@ public class ImageJForumSearcher extends AbstractWebSearcher {
 	@Override
 	public List<SearchResult> search(final String text, final boolean fuzzy) {
 		try {
-			final URL url = new URL("http://forum.imagej.net/search?q=" + URLEncoder
-				.encode(text) + "&source=imagej");
+			final URL url = new URL("http://forum.imagej.net/search?q=" + //
+				URLEncoder.encode(text, "utf-8") + "&source=imagej");
 			final Scanner s = new Scanner(url.openStream());
 			s.useDelimiter("\"topics\":");
 

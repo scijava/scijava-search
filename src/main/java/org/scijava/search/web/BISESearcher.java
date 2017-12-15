@@ -67,7 +67,7 @@ public class BISESearcher extends AbstractWebSearcher {
 		try {
 			// URL url = new URL("file:///c:/structure/temp/biii.eu_search2.html");
 			final URL url = new URL("http://biii.eu/search?search_api_fulltext=" +
-				URLEncoder.encode(text) + "&source=imagej");
+				URLEncoder.encode(text, "utf-8") + "&source=imagej");
 
 			final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 			final DocumentBuilder db = dbf.newDocumentBuilder();

@@ -74,6 +74,11 @@ public class SnippetSearchResult implements SearchResult {
 	public String name() {
 		return language.getLanguageName() + ": " + snippet;
 	}
+	
+	@Override
+	public String identifier() {
+		return name();
+	}
 
 	@Override
 	public String iconPath() {

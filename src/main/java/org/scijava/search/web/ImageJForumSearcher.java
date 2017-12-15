@@ -81,10 +81,10 @@ public class ImageJForumSearcher extends AbstractWebSearcher {
 				final String forumPostUrl = "http://forum.imagej.net/t/" + metaInfo.get(
 					"slug") + "/" + metaInfo.get("id") + "/";
 
-				final String details = "Url: " + forumPostUrl + "\n" + "Tags: " +
-					metaInfo.get("tags") + "\n" + "Created: " + metaInfo.get(
-						"created_at") + "\n" + "Last posted: " + metaInfo.get(
-							"last_posted_at") + "\n";
+				final String details = "Tags: " +
+					metaInfo.get("tags") + "<br />" + "Created: " + metaInfo.get(
+						"created_at") + "<br />" + "Last posted: " + metaInfo.get(
+							"last_posted_at");
 
 				addResult(metaInfo.get("title"), "", forumPostUrl, details);
 			}
@@ -102,6 +102,7 @@ public class ImageJForumSearcher extends AbstractWebSearcher {
 		String currentValue = "";
 		boolean readString = false;
 		boolean readKey = true;
+		boolean tagParentheses = false;
 		String currentChar = " ";
 		String previousChar = " ";
 		for (int i = 0; i < content.length(); i++) {
@@ -119,7 +120,7 @@ public class ImageJForumSearcher extends AbstractWebSearcher {
 					readKey = false;
 					continue;
 				}
-				if (currentChar.equals(",")) {
+				if (currentChar.equals(",") && !tagParentheses) {
 					readKey = true;
 					map.put(currentKey, currentValue);
 					currentKey = "";
@@ -133,6 +134,12 @@ public class ImageJForumSearcher extends AbstractWebSearcher {
 					currentKey = currentKey + currentChar;
 					continue;
 				}
+			}
+			if(currentChar.equals("[")){
+				tagParentheses = true;
+			}
+			if(currentChar.equals("]") && tagParentheses){
+				tagParentheses = false;
 			}
 			currentValue = currentValue + currentChar;
 

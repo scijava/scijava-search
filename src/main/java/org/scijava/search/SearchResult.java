@@ -42,6 +42,7 @@ import java.util.Map;
 public interface SearchResult {
 
 	String name();
+	String identifier();
 	String iconPath();
 	Map<String, String> properties();
 }

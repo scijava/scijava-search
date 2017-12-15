@@ -57,7 +57,7 @@ public class ModuleSearchResult implements SearchResult {
 		this.baseDir = baseDir;
 
 		props = new LinkedHashMap<>();
-		props.put("Title", info.getTitle());
+//		props.put("Title", info.getTitle());
 		final MenuPath menuPath = info.getMenuPath();
 		if (menuPath != null) {
 			props.put("Menu path", menuPath.getMenuString(false));
@@ -79,12 +79,21 @@ public class ModuleSearchResult implements SearchResult {
 	public String name() {
 		return info.getTitle();
 	}
+	
+	@Override
+	public String identifier() {
+		String menuPath = info.getMenuPath().getMenuString().replace(">", "›");
+		return menuPath.isEmpty() ? info.getTitle() : menuPath;
+	}
 
 	@Override
 	public String iconPath() {
 		final String iconPath = info.getIconPath();
-		return iconPath != null ? iconPath : //
-			info.getMenuPath().getLeaf().getIconPath();
+		if(iconPath != null) return iconPath;
+		if(info.getMenuPath() != null && info.getMenuPath().getLeaf() != null){
+			return info.getMenuPath().getLeaf().getIconPath();
+		}
+		return null;
 	}
 
 	@Override

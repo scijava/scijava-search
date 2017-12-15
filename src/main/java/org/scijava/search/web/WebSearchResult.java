@@ -61,19 +61,28 @@ public class WebSearchResult implements SearchResult {
 	public String name() {
 		return name;
 	}
+	
+	@Override
+	public String identifier() {
+		return name();
+	}
 
 	@Override
 	public String iconPath() {
 		return iconPath;
 	}
+	
+	public String details() {
+		return details;
+	}
 
 	@Override
 	public Map<String, String> properties() {
 		final HashMap<String, String> properties = new HashMap<>();
-		properties.put("name", name);
+//		properties.put("name", name);
 //		properties.put("iconpath", iconPath);
 		properties.put("url", url);
-		properties.put(null, "<body style='font-size: 11pt; font-family: Arial; background-color: #f4f4f7; padding: 10px 5px;'>.. " + details + " ..</body>");
+		properties.put(null, details);
 		return properties;
 	}
 }

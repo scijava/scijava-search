@@ -29,6 +29,7 @@
 
 package org.scijava.search.module;
 
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -68,6 +69,8 @@ public class ModuleSearcher implements Searcher {
 
 	@Override
 	public List<SearchResult> search(final String text, final boolean fuzzy) {
+		if (text.isEmpty()) return Collections.emptyList();
+
 		final String baseDir = //
 			appService.getApp().getBaseDirectory().getAbsolutePath();
 

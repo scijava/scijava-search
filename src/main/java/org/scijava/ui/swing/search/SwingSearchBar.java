@@ -70,10 +70,7 @@ import javax.swing.JTextPane;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
-import javax.swing.border.Border;
-import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
-import javax.swing.border.LineBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.html.HTMLDocument;
@@ -553,22 +550,18 @@ public class SwingSearchBar extends JTextField {
 			resultsList.setModel(listModel);
 
 			// TODO: Improve retainment of previous selection.
-			// TODO: find out why this still leads to freezes
-//			if(!searchTerm.isEmpty()) {
-//				System.out.println(searchTerm);
-//				if (previous == null) {
-//					if(listModel.getSize() > 0){
-//						System.out.println( "rebuild 5.1" );
-//						resultsList.setSelectedIndex(firstResultIndex());
-//					}
-//				}
-//				else {
-//					if(listModel.contains(previous)){
-//						System.out.println( "rebuild 5.2" );
-//						resultsList.setSelectedValue(previous, true);
-//					}
-//				}	
-//			}
+			if(!searchTerm.isEmpty()) {
+				if (previous == null) {
+					if(listModel.getSize() > 0){
+						resultsList.setSelectedIndex(firstResultIndex());
+					}
+				}
+				else {
+					if(listModel.contains(previous)){
+						resultsList.setSelectedValue(previous, true);
+					}
+				}
+			}
 		}
 
 		private Component icon(final String iconPath) {

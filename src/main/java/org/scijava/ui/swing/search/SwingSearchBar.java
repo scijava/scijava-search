@@ -622,18 +622,21 @@ public class SwingSearchBar extends JTextField {
 		}
 
 		private String highlightSearch(String text, String search, String before, String after) {
+			String[] terms = search.split(" ");
 			String output = new String(text);
-			List<Integer> res = new ArrayList<>();
-			for (int index = output.toLowerCase().indexOf(search); index >= 0; 
-					index = output.toLowerCase().indexOf(search, index + 1)) {
-				res.add(index);
-			}
-			for(int i = res.size()-1; i >= 0; i--) {
-				int index = res.get(i);
-				output = output.substring(0, index) + before
-						+ output.substring(index, index + search.length())
-						+ after
-						+ output.substring(index + search.length(), output.length());
+			for(String term : terms){
+				List<Integer> res = new ArrayList<>();
+				for (int index = output.toLowerCase().indexOf(term); index >= 0; 
+						index = output.toLowerCase().indexOf(term, index + 1)) {
+					res.add(index);
+				}
+				for(int i = res.size()-1; i >= 0; i--) {
+					int index = res.get(i);
+					output = output.substring(0, index) + before
+							+ output.substring(index, index + term.length())
+							+ after
+							+ output.substring(index + term.length(), output.length());
+				}
 			}
 			return output;
 		}

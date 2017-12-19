@@ -43,7 +43,7 @@ import org.scijava.search.SearchResult;
  */
 public class WebSearchResult implements SearchResult {
 
-	private final String details;
+	protected final String details;
 	String name;
 	String iconPath;
 	String url;

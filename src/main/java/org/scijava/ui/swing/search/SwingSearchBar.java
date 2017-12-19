@@ -42,6 +42,11 @@ import java.awt.event.FocusListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.net.URL;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -349,11 +354,17 @@ public class SwingSearchBar extends JTextField {
 			final JPanel detailsPane = new JPanel();
 			final JLabel detailsTitle = new JLabel();
 			final JPanel detailsProps = new JPanel();
+			final JScrollPane detailsScrollPane = new JScrollPane(detailsProps);
 			final JPanel detailsButtons = new JPanel();
 			
-			detailsProps.setLayout(new MigLayout("fill, wrap 1, ins 0, wmin 10"));
-			detailsButtons.setLayout(new MigLayout("fill, ins " + PAD + " 0 " + PAD + " 0"));
-			detailsPane.setLayout(new MigLayout("wrap, ins 0 " + PAD + " " + PAD + " " + PAD + ", fill, wmin 100, hmin 100","[grow]", "[fill][fill]push[fill]"));
+			detailsScrollPane.setHorizontalScrollBarPolicy(
+					ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+			detailsScrollPane.setBorder(null);
+			
+			detailsProps.setLayout(new MigLayout("wrap 1, ins 0, wmin 0, hmin 0", "[grow]", ""));
+			detailsButtons.setLayout(new MigLayout("fill, ins " + PAD + " 0 0 0"));
+			detailsPane.setLayout(new MigLayout("wrap, ins 0 " + PAD + " " + PAD + " " + PAD + ", fill, wmin 0, hmin 0, hmax 100%, wmax 100%",
+					"[grow]", "[fill][fill,grow][fill]"));
 
 			resultsList.addListSelectionListener(lse -> {
 				if (lse.getValueIsAdjusting()) return;
@@ -373,7 +384,6 @@ public class SwingSearchBar extends JTextField {
 				else {
 					// populate details pane
 					detailsTitle.setText("<html><h2>" + highlightSearchUnderline(escapeHtml(result.name()), searchTerm) + "</h2>");
-					detailsTitle.repaint();
 					detailsProps.removeAll();
 					result.properties().forEach((k, v) -> {
 						if(v != "") {
@@ -422,10 +432,7 @@ public class SwingSearchBar extends JTextField {
 						});
 						button.addKeyListener(new SearchBarKeyAdapter());
 						if(first){
-							JPanel mainBtnPane = new JPanel();
-							mainBtnPane.setLayout(new MigLayout("insets 0", "[fill,grow]", "[fill,grow]"));
-							mainBtnPane.add(button, "growx");
-							detailsButtons.add(mainBtnPane, "south");
+							detailsButtons.add(button, "grow, spanx");
 							JRootPane rootPane = this.getRootPane();
 							if(rootPane != null){
 								rootPane.setDefaultButton(button);
@@ -440,7 +447,7 @@ public class SwingSearchBar extends JTextField {
 			
 			detailsPane.add(exitBtn, "pos n 0 100% n");
 			detailsPane.add(detailsTitle,"growx, pad 0 0 0 -20");
-			detailsPane.add(detailsProps, "growx");
+			detailsPane.add(detailsScrollPane, "growx, hmin 0, wmin 0");
 			detailsPane.add(detailsButtons, "growx");
 			
 			resultsList.addKeyListener(new SearchBarKeyAdapter());
@@ -460,7 +467,7 @@ public class SwingSearchBar extends JTextField {
 		public void search(final String text) {
 			assertDispatchThread();
 			searchTerm = text;
-			operation.search(text);
+			operation.search(text.toLowerCase());
 		}
 
 		// -- Helper methods --
@@ -655,6 +662,7 @@ public class SwingSearchBar extends JTextField {
 			}
 			return out.toString();
 		}
+
 	}
 
 	private class SearchBarKeyAdapter extends KeyAdapter {

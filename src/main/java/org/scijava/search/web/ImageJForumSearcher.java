@@ -86,7 +86,7 @@ public class ImageJForumSearcher extends AbstractWebSearcher {
 						"created_at") + "<br />" + "Last posted: " + metaInfo.get(
 							"last_posted_at");
 
-				addResult(metaInfo.get("title"), "", forumPostUrl, details);
+				addResult(metaInfo.get("title"), "", forumPostUrl, metaInfo, details);
 			}
 		}
 		catch (final IOException e) {
@@ -94,6 +94,22 @@ public class ImageJForumSearcher extends AbstractWebSearcher {
 		}
 		return getSearchResults();
 	}
+	
+	/**
+	 * @param name Resulting website title / name
+	 * @param iconPath path to an image representing the results
+	 * @param url URL of the found website
+	 * @param metaInfo 
+	 * @param details some text from the website representing its content
+	 */
+	protected void addResult(final String name, final String iconPath,
+		final String url, HashMap< String, String > metaInfo, final String details)
+	{
+		getSearchResults().add(new ImageJForumSearchResult(name, //
+			iconPath == null || iconPath.isEmpty() ? "/icons/world_link.png"
+				: iconPath, url, metaInfo, details));
+	}
+
 
 	HashMap<String, String> parseForumSearchResult(String content) {
 		content = content + ",";

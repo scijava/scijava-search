@@ -39,7 +39,7 @@ import org.scijava.ui.UIService;
 
 /**
  * Search action for viewing the source code of a SciJava module.
- * 
+ *
  * @author Curtis Rueden
  */
 @Plugin(type = SearchActionFactory.class)

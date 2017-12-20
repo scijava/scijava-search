@@ -41,9 +41,10 @@ import org.scijava.service.Service;
  * @author Curtis Rueden
  */
 @Plugin(type = Service.class)
-public class DefaultSearchService extends AbstractSingletonService<SearchActionFactory> implements
-	SearchService
+public class DefaultSearchService extends
+	AbstractSingletonService<SearchActionFactory> implements SearchService
 {
+
 	@Parameter
 	private PrefService prefService;
 

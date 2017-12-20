@@ -26,6 +26,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  * #L%
  */
+
 package org.scijava.plugin;
 
 import org.scijava.Typed;
@@ -38,5 +39,6 @@ import org.scijava.Typed;
  * @param <O> Data type of objects created by the factory.
  */
 public interface FactoryPlugin<D, O> extends SingletonPlugin, Typed<D> {
+
 	O create(D data);
 }

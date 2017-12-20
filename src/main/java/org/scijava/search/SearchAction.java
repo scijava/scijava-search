@@ -26,6 +26,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  * #L%
  */
+
 package org.scijava.search;
 
 /**
@@ -34,14 +35,14 @@ package org.scijava.search;
  * {@link SearchActionFactory} plugins know how to generate these for specific
  * kinds of {@link SearchResult}.
  * </p>
- * 
+ *
  * @author Curtis Rueden
  * @see SearchService#actions(SearchResult)
  */
 public interface SearchAction extends Runnable {
 	// NB: No implementation needed.
-	
-	default boolean willCloseSearch(){
+
+	default boolean willCloseSearch() {
 		return true;
 	}
 }

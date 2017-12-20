@@ -26,6 +26,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  * #L%
  */
+
 package org.scijava.search;
 
 import java.util.List;
@@ -39,7 +40,7 @@ import org.scijava.plugin.SciJavaPlugin;
  * whereas {@code WikiSearcher} finds web pages on
  * <a href="https://imagej.net/">imagej.net</a> matching the query.
  * </p>
- * 
+ *
  * @author Curtis Rueden
  */
 public interface Searcher extends SciJavaPlugin {
@@ -54,9 +55,9 @@ public interface Searcher extends SciJavaPlugin {
 	default boolean enabled() {
 		return true;
 	}
-	
+
 	/** Whether this plugin supports a search of this term. */
-	default boolean supports(String term) {
+	default boolean supports(final String term) {
 		return true;
 	}
 

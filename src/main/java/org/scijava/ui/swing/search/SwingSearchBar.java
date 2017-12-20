@@ -104,9 +104,10 @@ public class SwingSearchBar extends JTextField {
 
 	private static final String DEFAULT_MESSAGE = "Click here to search";
 	private static final int MAX_RESULTS = 8;
-	
+
 	private static final Color SEARCHBAR_FONT_COLOR = new Color(0, 0, 0);
-	private static final Color SEARCHBAR_FONT_DEFAULT_COLOR = new Color(150, 150, 150);
+	private static final Color SEARCHBAR_FONT_DEFAULT_COLOR = new Color(150, 150,
+		150);
 
 	private static final Color SELECTED_COLOR = new Color(70, 152, 251);
 	private static final int ICON_SIZE = 16;
@@ -122,11 +123,11 @@ public class SwingSearchBar extends JTextField {
 	private PluginService pluginService;
 
 	private SwingSearchPanel searchPanel;
-	
-	private DocumentListener documentListener;
-	
+
+	private final DocumentListener documentListener;
+
 	private final JButton exitButton;
-	
+
 	private String searchTerm;
 
 	public SwingSearchBar(final Context context) {
@@ -134,10 +135,9 @@ public class SwingSearchBar extends JTextField {
 		context.inject(this);
 		setText(DEFAULT_MESSAGE);
 		setForeground(SEARCHBAR_FONT_DEFAULT_COLOR);
-		
-		setBorder(BorderFactory.createCompoundBorder(
-				BorderFactory.createEmptyBorder(), 
-				BorderFactory.createEmptyBorder(5,5,5,5)));
+
+		setBorder(BorderFactory.createCompoundBorder(BorderFactory
+			.createEmptyBorder(), BorderFactory.createEmptyBorder(5, 5, 5, 5)));
 
 		addActionListener(e -> run());
 		addKeyListener(new SearchBarKeyAdapter());
@@ -174,12 +174,12 @@ public class SwingSearchBar extends JTextField {
 					reset();
 				}
 			}
-
 		});
-		
+
 		exitButton = new JButton("\u2612");
-		exitButton.setBackground(new Color(255,255,255));
-		exitButton.setBorder(BorderFactory.createLineBorder(new Color(255,255,255),5));
+		exitButton.setBackground(new Color(255, 255, 255));
+		exitButton.setBorder(BorderFactory.createLineBorder(new Color(255, 255,
+			255), 5));
 		exitButton.addActionListener(ae -> {
 			reset();
 			loseFocus();
@@ -234,15 +234,18 @@ public class SwingSearchBar extends JTextField {
 			}
 
 			searchPanel = new SwingSearchPanel(); // Spawns the SearchOperation!
-			getParent().add(searchPanel, "south,height 300!", getParent().getComponentCount()-1);
+			getParent().add(searchPanel, "south,height 300!", getParent()
+				.getComponentCount() - 1);
 			getParent().doLayout();
 			getParent().revalidate();
 			window().pack();
 			getParent().repaint();
 			threadService.queue(() -> {
 				searchPanel.setVisible(true);
-				try { Thread.sleep(100); }
-				catch (InterruptedException exc) {}
+				try {
+					Thread.sleep(100);
+				}
+				catch (final InterruptedException exc) {}
 				grabFocus();
 				requestFocus();
 			});
@@ -259,7 +262,7 @@ public class SwingSearchBar extends JTextField {
 
 	private void reset() {
 		assertDispatchThread();
-		if (searchPanel == null){
+		if (searchPanel == null) {
 			loseFocus();
 			getDocument().removeDocumentListener(documentListener);
 			setText(DEFAULT_MESSAGE);
@@ -294,15 +297,15 @@ public class SwingSearchBar extends JTextField {
 		private final Map<Class<?>, SearchEvent> allResults;
 		private final Map<Class<?>, JCheckBox> headerCheckboxes;
 		private final JList<SearchResult> resultsList;
-		
+
 		private SearchResult selected = null;
 
 		public SwingSearchPanel() {
-			
+
 			setLayout(new BorderLayout());
 			setPreferredSize(new Dimension(800, 300));
 			setBorder(BorderFactory.createEmptyBorder());
-			
+
 			operation = searchService.search(//
 				event -> threadService.queue(() -> update(event)));
 
@@ -326,13 +329,15 @@ public class SwingSearchBar extends JTextField {
 					final JPanel headerInnerPane = new JPanel();
 					headerInnerPane.setLayout(new GridLayout(1, 1));
 					headerInnerPane.add(headerBox);
-					if (parent != null) headerInnerPane.setBackground(parent.getBackground());
+					if (parent != null) headerInnerPane.setBackground(parent
+						.getBackground());
 
 					final JPanel headerOuterPane = new JPanel();
 					headerOuterPane.setLayout(new GridLayout(1, 1));
 					headerOuterPane.add(headerInnerPane);
 					headerOuterPane.setBackground(list.getBackground());
-					headerOuterPane.setBorder(new EmptyBorder(index == 0? 0 : PAD, 0, 0, 0));
+					headerOuterPane.setBorder(new EmptyBorder(index == 0 ? 0 : PAD, 0, 0,
+						0));
 					return headerOuterPane;
 				}
 				final JPanel item = new JPanel();
@@ -365,22 +370,27 @@ public class SwingSearchBar extends JTextField {
 			final JPanel detailsButtons = new JPanel();
 
 			detailsScrollPane.setHorizontalScrollBarPolicy(
-					ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 			detailsScrollPane.setBorder(null);
 
-			detailsProps.setLayout(new MigLayout("wrap 1, ins 0, wmin 0, hmin 0", "[grow]", ""));
+			detailsProps.setLayout(new MigLayout("wrap 1, ins 0, wmin 0, hmin 0",
+				"[grow]", ""));
 			detailsButtons.setLayout(new MigLayout("fill, ins " + PAD + " 0 0 0"));
-			detailsPane.setLayout(new MigLayout("wrap, ins 0 " + PAD + " " + PAD + " " + PAD + ", fill, wmin 0, hmin 0, hmax 100%, wmax 100%",
-					"[grow]", "[fill][fill,grow][fill]"));
+			detailsPane.setLayout(new MigLayout("wrap, ins 0 " + PAD + " " + PAD +
+				" " + PAD + ", fill, wmin 0, hmin 0, hmax 100%, wmax 100%", "[grow]",
+				"[fill][fill,grow][fill]"));
 
 			resultsList.addMouseListener(new MouseAdapter() {
+
 				@Override
-				public void mouseClicked( MouseEvent e ) {
+				public void mouseClicked(final MouseEvent e) {
 					final SearchResult result = resultsList.getSelectedValue();
 					if (result == null || isHeader(result)) {
 						if (result != null) {
-							final Searcher searcher = ((SearchResultHeader) result).searcher();
-							searchService.setEnabled(searcher, !searchService.enabled(searcher));
+							final Searcher searcher = ((SearchResultHeader) result)
+								.searcher();
+							searchService.setEnabled(searcher, !searchService.enabled(
+								searcher));
 							SwingSearchBar.this.search();
 						}
 					}
@@ -388,13 +398,15 @@ public class SwingSearchBar extends JTextField {
 			});
 
 			resultsList.addMouseMotionListener(new MouseMotionAdapter() {
+
 				@Override
-				public void mouseMoved( MouseEvent e ) {
-					int index = resultsList.locationToIndex(e.getPoint());
-					SearchResult _selected = resultsList.getModel().getElementAt(index);
-					if(selected != _selected) {
+				public void mouseMoved(final MouseEvent e) {
+					final int index = resultsList.locationToIndex(e.getPoint());
+					final SearchResult _selected = resultsList.getModel().getElementAt(
+						index);
+					if (selected != _selected) {
 						selected = _selected;
-						if(selected != null && !isHeader(selected)) {
+						if (selected != null && !isHeader(selected)) {
 							resultsList.setSelectedValue(selected, false);
 						}
 					}
@@ -405,7 +417,7 @@ public class SwingSearchBar extends JTextField {
 				if (lse.getValueIsAdjusting()) return;
 				final SearchResult result = resultsList.getSelectedValue();
 				if (result == null || isHeader(result)) {
-					if(result != null){
+					if (result != null) {
 						threadService.queue(() -> {
 							down();
 						});
@@ -418,21 +430,24 @@ public class SwingSearchBar extends JTextField {
 				}
 				else {
 					// populate details pane
-					detailsTitle.setText("<html><h2>" + highlightSearchUnderline(escapeHtml(result.name()), searchTerm) + "</h2>");
+					detailsTitle.setText("<html><h2>" + highlightSearchUnderline(
+						escapeHtml(result.name()), searchTerm) + "</h2>");
 					detailsProps.removeAll();
 					result.properties().forEach((k, v) -> {
-						if(v != "") {
+						if (v != "") {
 							if (k == null) {
 								final JTextPane textPane = new JTextPane();
 								textPane.setContentType("text/html");
 								textPane.setText(highlightSearchBold(v, searchTerm));
-								Font font = UIManager.getFont("Label.font");
-								String bodyRule = "body { font-family: " + font.getFamily() + "; " + 
-										"font-size: " + font.getSize() + "pt; }";
-								((HTMLDocument)textPane.getDocument()).getStyleSheet().addRule(bodyRule);
+								final Font font = UIManager.getFont("Label.font");
+								final String bodyRule = "body { font-family: " + font
+									.getFamily() + "; " + "font-size: " + font.getSize() +
+									"pt; }";
+								((HTMLDocument) textPane.getDocument()).getStyleSheet().addRule(
+									bodyRule);
 								textPane.setBorder(BorderFactory.createCompoundBorder(
-										BorderFactory.createMatteBorder(1, 0, 1, 0, Color.DARK_GRAY),
-										BorderFactory.createEmptyBorder(PAD, 0, PAD, 0)));
+									BorderFactory.createMatteBorder(1, 0, 1, 0, Color.DARK_GRAY),
+									BorderFactory.createEmptyBorder(PAD, 0, PAD, 0)));
 								textPane.setEditable(false);
 								textPane.setOpaque(false);
 								detailsProps.add(textPane, "growx, wmax 100%");
@@ -457,34 +472,35 @@ public class SwingSearchBar extends JTextField {
 					detailsButtons.removeAll();
 					final List<SearchAction> actions = searchService.actions(result);
 					boolean first = true;
-					for(SearchAction action : actions){
+					for (final SearchAction action : actions) {
 						final JButton button = new JButton(action.toString());
 						button.addActionListener(ae -> {
 							action.run();
-							if(action.willCloseSearch()){
+							if (action.willCloseSearch()) {
 								reset();
 							}
 						});
 						button.addKeyListener(new SearchBarKeyAdapter());
-						if(first){
+						if (first) {
 							detailsButtons.add(button, "grow, spanx");
-							JRootPane rootPane = this.getRootPane();
-							if(rootPane != null){
+							final JRootPane rootPane = this.getRootPane();
+							if (rootPane != null) {
 								rootPane.setDefaultButton(button);
 							}
 							first = false;
-						}else{
+						}
+						else {
 							detailsButtons.add(button, "growx");
 						}
 					}
 				}
 			});
-			
+
 			detailsPane.add(exitButton, "pos n 0 100% n");
-			detailsPane.add(detailsTitle,"growx, pad 0 0 0 -20");
+			detailsPane.add(detailsTitle, "growx, pad 0 0 0 -20");
 			detailsPane.add(detailsScrollPane, "growx, hmin 0, wmin 0");
 			detailsPane.add(detailsButtons, "growx");
-			
+
 			resultsList.addKeyListener(new SearchBarKeyAdapter());
 
 			// uncomment the following lines to hide the JSplitPane divider borders
@@ -492,7 +508,7 @@ public class SwingSearchBar extends JTextField {
 //			UIManager.put("SplitPaneDivider.border", border);
 			final JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
 			splitPane.setLeftComponent(resultsPane);
-			splitPane.setRightComponent(detailsPane); 
+			splitPane.setRightComponent(detailsPane);
 			detailsPane.setMinimumSize(new Dimension(0, 0));
 			resultsPane.setMinimumSize(new Dimension(0, 0));
 			splitPane.setBorder(null);
@@ -538,18 +554,19 @@ public class SwingSearchBar extends JTextField {
 		private int rowCount() {
 			return resultsList.getModel().getSize();
 		}
-		
+
 		private int resultCount() {
 			int count = 0;
-			for(int i = 0; i < resultsList.getModel().getSize(); i++){
-				SearchResult result = resultsList.getModel().getElementAt(i);
-				if(!isHeader(result)) count++;
+			for (int i = 0; i < resultsList.getModel().getSize(); i++) {
+				final SearchResult result = resultsList.getModel().getElementAt(i);
+				if (!isHeader(result)) count++;
 			}
 			return count;
 		}
 
-		private Font smaller(Font font, int decrement) {
-			return new Font(font.getFontName(), font.getStyle(), font.getSize() - decrement);
+		private Font smaller(final Font font, final int decrement) {
+			return new Font(font.getFontName(), font.getStyle(), font.getSize() -
+				decrement);
 		}
 
 		/** Executes the default search action. */
@@ -574,9 +591,9 @@ public class SwingSearchBar extends JTextField {
 			sort(searchers, Searcher.class);
 
 			// Build the new list model.
-			DefaultListModel<SearchResult> listModel = new DefaultListModel<>();
+			final DefaultListModel<SearchResult> listModel = new DefaultListModel<>();
 			for (final Searcher searcher : searchers) {
-				
+
 				// Look up the results list.
 				final List<SearchResult> completeResults = //
 					allResults.get(searcher.getClass()).results();
@@ -601,14 +618,14 @@ public class SwingSearchBar extends JTextField {
 			resultsList.setModel(listModel);
 
 			// TODO: Improve retainment of previous selection.
-			if(!searchTerm.isEmpty()) {
+			if (!searchTerm.isEmpty()) {
 				if (previous == null) {
-					if(listModel.getSize() > 0){
+					if (listModel.getSize() > 0) {
 						resultsList.setSelectedIndex(firstResultIndex());
 					}
 				}
 				else {
-					if(listModel.contains(previous)){
+					if (listModel.contains(previous)) {
 						resultsList.setSelectedValue(previous, true);
 					}
 				}
@@ -619,7 +636,7 @@ public class SwingSearchBar extends JTextField {
 			// TODO make icon() return URL, not String.
 			if (iconPath == null || iconPath.isEmpty()) return emptyIcon();
 			final URL iconURL = getClass().getResource(iconPath);
-			if(iconURL == null) return emptyIcon();
+			if (iconURL == null) return emptyIcon();
 			final ImageIcon icon = new ImageIcon(iconURL);
 			if (icon.getIconWidth() != ICON_SIZE || //
 				icon.getIconHeight() != ICON_SIZE)
@@ -658,49 +675,54 @@ public class SwingSearchBar extends JTextField {
 
 		private boolean isFirstNonHeader(final int index) {
 			assertDispatchThread();
-			for (int i = index-1; i >= 0; i--) {
+			for (int i = index - 1; i >= 0; i--) {
 				if (!isHeader(result(i))) return false;
 			}
 			return true;
 		}
 
-		private String highlightSearchUnderline(String text, String search) {
+		private String highlightSearchUnderline(final String text,
+			final String search)
+		{
 			return highlightSearch(text, search, "<u>", "</u>");
 		}
 
-		private String highlightSearchBold(String text, String search) {
+		private String highlightSearchBold(final String text, final String search) {
 			return highlightSearch(text, search, "<b>", "</b>");
 		}
 
-		private String highlightSearch(String text, String search, String before, String after) {
-			String[] terms = search.split(" ");
+		private String highlightSearch(final String text, final String search,
+			final String before, final String after)
+		{
+			final String[] terms = search.split(" ");
 			String output = new String(text);
-			for(String term : terms){
-				List<Integer> res = new ArrayList<>();
-				for (int index = output.toLowerCase().indexOf(term); index >= 0; 
-						index = output.toLowerCase().indexOf(term, index + 1)) {
+			for (final String term : terms) {
+				final List<Integer> res = new ArrayList<>();
+				for (int index = output.toLowerCase().indexOf(term); index >= 0; index =
+					output.toLowerCase().indexOf(term, index + 1))
+				{
 					res.add(index);
 				}
-				for(int i = res.size()-1; i >= 0; i--) {
-					int index = res.get(i);
-					output = output.substring(0, index) + before
-							+ output.substring(index, index + term.length())
-							+ after
-							+ output.substring(index + term.length(), output.length());
+				for (int i = res.size() - 1; i >= 0; i--) {
+					final int index = res.get(i);
+					output = output.substring(0, index) + before + output.substring(index,
+						index + term.length()) + after + output.substring(index + term
+							.length(), output.length());
 				}
 			}
 			return output;
 		}
 
-		public String escapeHtml(String s) {
-			StringBuilder out = new StringBuilder(Math.max(16, s.length()));
+		public String escapeHtml(final String s) {
+			final StringBuilder out = new StringBuilder(Math.max(16, s.length()));
 			for (int i = 0; i < s.length(); i++) {
-				char c = s.charAt(i);
+				final char c = s.charAt(i);
 				if (c > 127 || c == '"' || c == '<' || c == '>' || c == '&') {
 					out.append("&#");
 					out.append((int) c);
 					out.append(';');
-				} else {
+				}
+				else {
 					out.append(c);
 				}
 			}
@@ -710,6 +732,7 @@ public class SwingSearchBar extends JTextField {
 	}
 
 	private class SearchBarKeyAdapter extends KeyAdapter {
+
 		@Override
 		public void keyPressed(final KeyEvent e) {
 			switch (e.getKeyCode()) {
@@ -733,7 +756,7 @@ public class SwingSearchBar extends JTextField {
 					reset();
 					break;
 				case KeyEvent.VK_L:
-					if(!hasFocus()){
+					if (!hasFocus()) {
 						requestFocusInWindow();
 						selectAll();
 					}

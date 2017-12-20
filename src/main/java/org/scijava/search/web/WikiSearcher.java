@@ -56,7 +56,7 @@ import org.xml.sax.SAXException;
  */
 @Plugin(type = Searcher.class, name = "ImageJ Wiki")
 public class WikiSearcher extends AbstractWebSearcher {
-	
+
 	@Parameter
 	private LogService log;
 

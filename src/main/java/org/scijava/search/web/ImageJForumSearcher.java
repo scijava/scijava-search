@@ -49,7 +49,7 @@ import org.scijava.search.Searcher;
  */
 @Plugin(type = Searcher.class, name = "ImageJ Forum")
 public class ImageJForumSearcher extends AbstractWebSearcher {
-	
+
 	@Parameter
 	private LogService log;
 
@@ -81,10 +81,9 @@ public class ImageJForumSearcher extends AbstractWebSearcher {
 				final String forumPostUrl = "http://forum.imagej.net/t/" + metaInfo.get(
 					"slug") + "/" + metaInfo.get("id") + "/";
 
-				final String details = "Tags: " +
-					metaInfo.get("tags") + "<br />" + "Created: " + metaInfo.get(
-						"created_at") + "<br />" + "Last posted: " + metaInfo.get(
-							"last_posted_at");
+				final String details = "Tags: " + metaInfo.get("tags") + "<br />" +
+					"Created: " + metaInfo.get("created_at") + "<br />" +
+					"Last posted: " + metaInfo.get("last_posted_at");
 
 				addResult(metaInfo.get("title"), "", forumPostUrl, metaInfo, details);
 			}
@@ -94,22 +93,22 @@ public class ImageJForumSearcher extends AbstractWebSearcher {
 		}
 		return getSearchResults();
 	}
-	
+
 	/**
 	 * @param name Resulting website title / name
 	 * @param iconPath path to an image representing the results
 	 * @param url URL of the found website
-	 * @param metaInfo 
+	 * @param metaInfo
 	 * @param details some text from the website representing its content
 	 */
 	protected void addResult(final String name, final String iconPath,
-		final String url, HashMap< String, String > metaInfo, final String details)
+		final String url, final HashMap<String, String> metaInfo,
+		final String details)
 	{
 		getSearchResults().add(new ImageJForumSearchResult(name, //
 			iconPath == null || iconPath.isEmpty() ? "/icons/world_link.png"
 				: iconPath, url, metaInfo, details));
 	}
-
 
 	HashMap<String, String> parseForumSearchResult(String content) {
 		content = content + ",";
@@ -151,10 +150,10 @@ public class ImageJForumSearcher extends AbstractWebSearcher {
 					continue;
 				}
 			}
-			if(currentChar.equals("[")){
+			if (currentChar.equals("[")) {
 				tagParentheses = true;
 			}
-			if(currentChar.equals("]") && tagParentheses){
+			if (currentChar.equals("]") && tagParentheses) {
 				tagParentheses = false;
 			}
 			currentValue = currentValue + currentChar;

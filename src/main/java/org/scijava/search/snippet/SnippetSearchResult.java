@@ -26,6 +26,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  * #L%
  */
+
 package org.scijava.search.snippet;
 
 import java.util.LinkedHashMap;
@@ -74,7 +75,7 @@ public class SnippetSearchResult implements SearchResult {
 	public String name() {
 		return language.getLanguageName() + ": " + snippet;
 	}
-	
+
 	@Override
 	public String identifier() {
 		return name();
@@ -95,7 +96,7 @@ public class SnippetSearchResult implements SearchResult {
 
 	private String s(final List<String> names) {
 		if (names == null || names.isEmpty()) return "<None>";
-		StringBuilder sb = new StringBuilder();
+		final StringBuilder sb = new StringBuilder();
 		for (int i = 0; i < names.size(); i++) {
 			if (i > 0) sb.append(", ");
 			sb.append(names.get(i));

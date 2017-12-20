@@ -47,9 +47,7 @@ import org.scijava.search.SearchResult;
  * @author Robert Haase (MPI-CBG)
  */
 @Plugin(type = SearchActionFactory.class)
-public class OpenInBrowserActionFactory implements
-	SearchActionFactory
-{
+public class OpenInBrowserActionFactory implements SearchActionFactory {
 
 	@Parameter
 	private PlatformService platformService;

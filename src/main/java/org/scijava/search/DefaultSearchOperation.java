@@ -42,7 +42,7 @@ import org.scijava.thread.ThreadService;
 
 /**
  * Default implementation of {@link SearchOperation}.
- * 
+ *
  * @author Curtis Rueden
  */
 public class DefaultSearchOperation implements SearchOperation {
@@ -71,7 +71,9 @@ public class DefaultSearchOperation implements SearchOperation {
 	private boolean fuzzy;
 	private long lastModifyTime;
 
-	public DefaultSearchOperation(final Context context, final SearchListener... callbacks) {
+	public DefaultSearchOperation(final Context context,
+		final SearchListener... callbacks)
+	{
 		listeners = callbacks;
 		context.inject(this);
 		threadService.run(() -> {
@@ -102,7 +104,7 @@ public class DefaultSearchOperation implements SearchOperation {
 	}
 
 	@Override
-	public void setFuzzy(boolean fuzzy) {
+	public void setFuzzy(final boolean fuzzy) {
 		this.fuzzy = fuzzy;
 		refreshModifyTime();
 	}
@@ -141,10 +143,11 @@ public class DefaultSearchOperation implements SearchOperation {
 		lastModifyTime = System.currentTimeMillis();
 	}
 
-	// -- Helper classes  --
+	// -- Helper classes --
 
 	private class SearchAttempt implements Runnable {
-		private Searcher searcher;
+
+		private final Searcher searcher;
 		private boolean valid = true;
 
 		private SearchAttempt(final Searcher searcher) {

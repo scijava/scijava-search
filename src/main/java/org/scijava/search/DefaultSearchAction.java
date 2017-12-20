@@ -40,7 +40,9 @@ public class DefaultSearchAction implements SearchAction {
 	private final Runnable r;
 	private final boolean closeSearch;
 
-	public DefaultSearchAction(final String label, final Runnable r, final boolean closeSearch) {
+	public DefaultSearchAction(final String label, final Runnable r,
+		final boolean closeSearch)
+	{
 		this.label = label;
 		this.r = r;
 		this.closeSearch = closeSearch;
@@ -55,9 +57,9 @@ public class DefaultSearchAction implements SearchAction {
 	public void run() {
 		r.run();
 	}
-	
-	@Override 
-	public boolean willCloseSearch(){
+
+	@Override
+	public boolean willCloseSearch() {
 		return closeSearch;
 	}
 }

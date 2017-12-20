@@ -37,7 +37,7 @@ import org.scijava.search.Searcher;
 /**
  * The AbstractWebSearcher contains convenience functions to manage search
  * results of all {@link Searcher} plugins browsing the web.
- * 
+ *
  * @author Robert Haase (MPI-CBG)
  */
 public abstract class AbstractWebSearcher implements Searcher {

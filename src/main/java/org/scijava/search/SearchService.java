@@ -46,7 +46,7 @@ public interface SearchService extends SingletonService<SearchActionFactory>,
 
 	/**
 	 * Begins an asynchronous and multi-threaded search operation.
-	 * 
+	 *
 	 * @param callbacks The objects to be notified as search results are found.
 	 *          Callbacks will be made on the thread doing the search,
 	 *          <em>not</em> the dispatch thread; it is the responsibility of
@@ -60,7 +60,7 @@ public interface SearchService extends SingletonService<SearchActionFactory>,
 
 	/**
 	 * Gets the suite of available actions for the given search result.
-	 * 
+	 *
 	 * @param result The search result for which available actions are desired.
 	 * @return A list of actions which could possibly be executed for the result.
 	 */

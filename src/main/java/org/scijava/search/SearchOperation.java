@@ -59,7 +59,7 @@ public interface SearchOperation {
 	 * Intended to be called from the dispatch thread in response to the search
 	 * pane's text field being updated by the user.
 	 * </p>
-	 * 
+	 *
 	 * @param text The query to be searched.
 	 */
 	void search(String text);
@@ -72,7 +72,7 @@ public interface SearchOperation {
 	 * Intended to be called from the dispatch thread in response to the search
 	 * pane's fuzzy matching checkbox being toggled by the user.
 	 * </p>
-	 * 
+	 *
 	 * @param fuzzy Whether the search should perform "fuzzy" matching.
 	 */
 	void setFuzzy(boolean fuzzy);

@@ -54,7 +54,7 @@ import org.xml.sax.SAXException;
  */
 //@Plugin(type = Searcher.class, name = "BISE")
 public class BISESearcher extends AbstractWebSearcher {
-	
+
 	@Parameter
 	private LogService log;
 

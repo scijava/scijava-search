@@ -26,6 +26,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  * #L%
  */
+
 package org.scijava.search.module;
 
 import java.io.File;
@@ -73,24 +74,27 @@ public class ModuleSearchResult implements SearchResult {
 		props.put("Location", getLocation());
 	}
 
-	public ModuleInfo info() { return info; }
+	public ModuleInfo info() {
+		return info;
+	}
 
 	@Override
 	public String name() {
 		return info.getTitle();
 	}
-	
+
 	@Override
 	public String identifier() {
-		String menuPath = info.getMenuPath().getMenuString().replace(">", "\u203a");
+		final String menuPath = info.getMenuPath().getMenuString().replace(">",
+			"\u203a");
 		return menuPath.isEmpty() ? info.getTitle() : menuPath;
 	}
 
 	@Override
 	public String iconPath() {
 		final String iconPath = info.getIconPath();
-		if(iconPath != null) return iconPath;
-		if(info.getMenuPath() != null && info.getMenuPath().getLeaf() != null){
+		if (iconPath != null) return iconPath;
+		if (info.getMenuPath() != null && info.getMenuPath().getLeaf() != null) {
 			return info.getMenuPath().getLeaf().getIconPath();
 		}
 		return null;

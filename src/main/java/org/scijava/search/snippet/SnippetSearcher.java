@@ -53,7 +53,7 @@ public class SnippetSearcher implements Searcher {
 
 	@Parameter
 	private ScriptService scriptService;
-	
+
 	@Parameter
 	private SearchService searchService;
 
@@ -62,7 +62,7 @@ public class SnippetSearcher implements Searcher {
 		// NB: A misnomer, but it's the term users are familiar with.
 		return "Code snippets";
 	}
-	
+
 	@Override
 	public boolean supports(final String text) {
 		return text.startsWith("#!") || text.startsWith("!");
@@ -75,18 +75,17 @@ public class SnippetSearcher implements Searcher {
 
 	@Override
 	public List<SearchResult> search(final String text, final boolean fuzzy) {
-		if(!searchService.enabled(this)) return new ArrayList<>();
+		if (!searchService.enabled(this)) return new ArrayList<>();
 		if (text.startsWith("#!")) {
 			final String[] tokens = text.split("\\s", 2);
 			if (tokens.length < 2) return Collections.emptyList();
 			final String langHint = tokens[0];
 			final String snippet = tokens[1];
 
-			return results(scriptService.getLanguages().stream().filter(language ->
-				matches(langHint, language.getLanguageName()) ||
-				matches(langHint, language.getNames()) ||
-				matches(langHint, language.getExtensions())
-				).collect(Collectors.toList()), snippet);
+			return results(scriptService.getLanguages().stream().filter(
+				language -> matches(langHint, language.getLanguageName()) || matches(
+					langHint, language.getNames()) || matches(langHint, language
+						.getExtensions())).collect(Collectors.toList()), snippet);
 		}
 		if (text.startsWith("!")) {
 			return results(scriptService.getLanguages(), text.substring(1));
@@ -96,7 +95,7 @@ public class SnippetSearcher implements Searcher {
 
 	// -- Helper methods --
 
-	private boolean matches(String actual, List<String> desiredList) {
+	private boolean matches(final String actual, final List<String> desiredList) {
 		return desiredList.stream().filter( //
 			desired -> matches(actual, desired)).findAny().isPresent();
 	}

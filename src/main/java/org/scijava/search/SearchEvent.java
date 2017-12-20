@@ -42,8 +42,8 @@ public class SearchEvent {
 	private final List<SearchResult> results;
 	private final boolean exclusive;
 
-	public SearchEvent(final Searcher searcher,
-		final List<SearchResult> results, final boolean exclusive)
+	public SearchEvent(final Searcher searcher, final List<SearchResult> results,
+		final boolean exclusive)
 	{
 		this.searcher = searcher;
 		this.results = results;

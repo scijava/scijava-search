@@ -38,7 +38,7 @@ import org.scijava.search.SearchResult;
  * This class represents a typical web search result being represented by a
  * name/title of a website, an image (icon), the url of the website and some
  * text from the website as preview of its content.
- * 
+ *
  * @author Robert Haase (MPI-CBG)
  */
 public class WebSearchResult implements SearchResult {
@@ -61,7 +61,7 @@ public class WebSearchResult implements SearchResult {
 	public String name() {
 		return name;
 	}
-	
+
 	@Override
 	public String identifier() {
 		return name();
@@ -71,7 +71,7 @@ public class WebSearchResult implements SearchResult {
 	public String iconPath() {
 		return iconPath;
 	}
-	
+
 	public String details() {
 		return details;
 	}

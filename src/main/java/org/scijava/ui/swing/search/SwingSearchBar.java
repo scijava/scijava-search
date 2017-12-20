@@ -61,6 +61,7 @@ import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -211,6 +212,46 @@ public class SwingSearchBar extends JTextField {
 		Collections.sort(instances, comparator);
 	}
 
+	// -- Internal methods --
+
+	/** Called on the EDT when the search panel wants to appear. */
+	protected void showPanel(final Container panel) {
+		assertDispatchThread();
+
+		// create a dedicated "Quick Search" dialog
+		final Window w = window();
+		final JDialog dialog = new JDialog(w, "Quick Search");
+		dialog.setContentPane(panel);
+		dialog.pack();
+
+		// position below the parent window
+		final int x = w.getLocation().x;
+		final int y = w.getLocation().y + w.getHeight() + 1;
+		dialog.setLocation(x, y);
+		threadService.queue(() -> {
+			dialog.setVisible(true);
+			try { Thread.sleep(100); }
+			catch (InterruptedException exc) {}
+			grabFocus();
+			requestFocus();
+		});
+	}
+
+	/** Called on the EDT when the search panel wants to disappear. */
+	protected void hidePanel(final Container panel) {
+		assertDispatchThread();
+
+		// assume panel is inside its dedicated "Quick Search" dialog
+		final Window w = SwingUtilities.getWindowAncestor(panel);
+		if (w != null) w.dispose();
+	}
+
+	/** Called on the EDT when the search text field wants to lose the focus. */
+	protected void loseFocus() {
+		assertDispatchThread();
+		window().requestFocusInWindow();
+	}
+
 	// -- Helper methods --
 
 	/** Defensive programming check to avoid bugs. */
@@ -232,23 +273,8 @@ public class SwingSearchBar extends JTextField {
 				// NB: Defer creating a new search dialog until something is typed.
 				return;
 			}
-
 			searchPanel = new SwingSearchPanel(); // Spawns the SearchOperation!
-			getParent().add(searchPanel, "south,height 300!", getParent()
-				.getComponentCount() - 1);
-			getParent().doLayout();
-			getParent().revalidate();
-			window().pack();
-			getParent().repaint();
-			threadService.queue(() -> {
-				searchPanel.setVisible(true);
-				try {
-					Thread.sleep(100);
-				}
-				catch (final InterruptedException exc) {}
-				grabFocus();
-				requestFocus();
-			});
+			showPanel(searchPanel);
 		}
 		searchPanel.search(getText());
 	}
@@ -270,23 +296,11 @@ public class SwingSearchBar extends JTextField {
 			getDocument().addDocumentListener(documentListener);
 		}
 		else {
-			threadService.queue(() -> {
-				getParent().remove(searchPanel);
-				getParent().revalidate();
-				getParent().repaint();
-				final Window w = window();
-				w.revalidate();
-				w.pack();
-				w.repaint();
-				searchPanel = null;
-			});
+			hidePanel(searchPanel);
+			searchPanel = null;
 			setText("");
 			requestFocusInWindow();
 		}
-	}
-
-	private void loseFocus() {
-		SwingUtilities.getWindowAncestor(this).requestFocusInWindow();
 	}
 
 	// -- Helper classes --

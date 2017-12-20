@@ -177,7 +177,7 @@ public class SwingSearchBar extends JTextField {
 
 		});
 		
-		exitButton = new JButton("🞩");
+		exitButton = new JButton("\u2612");
 		exitButton.setBackground(new Color(255,255,255));
 		exitButton.setBorder(BorderFactory.createLineBorder(new Color(255,255,255),5));
 		exitButton.addActionListener(ae -> {

@@ -82,7 +82,7 @@ public class ModuleSearchResult implements SearchResult {
 	
 	@Override
 	public String identifier() {
-		String menuPath = info.getMenuPath().getMenuString().replace(">", "›");
+		String menuPath = info.getMenuPath().getMenuString().replace(">", "\u203a");
 		return menuPath.isEmpty() ? info.getTitle() : menuPath;
 	}
 

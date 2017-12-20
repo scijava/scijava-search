@@ -122,8 +122,6 @@ public class SwingSearchBar extends JTextField {
 	@Parameter
 	private PluginService pluginService;
 
-	private final Window window;
-	private final Container parent;
 	private SwingSearchPanel searchPanel;
 	
 	private DocumentListener documentListener;
@@ -132,10 +130,8 @@ public class SwingSearchBar extends JTextField {
 	
 	private String searchTerm;
 
-	public SwingSearchBar(final Context context, final Window window, final Container parent) {
+	public SwingSearchBar(final Context context) {
 		super(DEFAULT_MESSAGE, 12);
-		this.parent = parent;
-		this.window = window;
 		context.inject(this);
 		setText(DEFAULT_MESSAGE);
 		setForeground(SEARCHBAR_FONT_DEFAULT_COLOR);
@@ -225,6 +221,10 @@ public class SwingSearchBar extends JTextField {
 		}
 	}
 
+	private Window window() {
+		return SwingUtilities.getWindowAncestor(this);
+	}
+
 	/** Called whenever the user types something. */
 	private void search() {
 		assertDispatchThread();
@@ -235,11 +235,11 @@ public class SwingSearchBar extends JTextField {
 			}
 
 			searchPanel = new SwingSearchPanel(); // Spawns the SearchOperation!
-			parent.add(searchPanel, "south,height 300!", getParent().getComponentCount()-1);
-			parent.doLayout();
-			parent.revalidate();
-			window.pack();
-			parent.repaint();
+			getParent().add(searchPanel, "south,height 300!", getParent().getComponentCount()-1);
+			getParent().doLayout();
+			getParent().revalidate();
+			window().pack();
+			getParent().repaint();
 			threadService.queue(() -> {
 				searchPanel.setVisible(true);
 				try { Thread.sleep(100); }
@@ -269,12 +269,13 @@ public class SwingSearchBar extends JTextField {
 		}
 		else {
 			threadService.queue(() -> {
-				parent.remove(searchPanel);
-				parent.revalidate();
-				parent.repaint();
-				window.revalidate();
-				window.pack();
-				window.repaint();
+				getParent().remove(searchPanel);
+				getParent().revalidate();
+				getParent().repaint();
+				final Window w = window();
+				w.revalidate();
+				w.pack();
+				w.repaint();
 				searchPanel = null;
 			});
 			setText("");
@@ -314,16 +315,19 @@ public class SwingSearchBar extends JTextField {
 				cellHasFocus) -> {
 				if (isHeader(value)) {
 					final Searcher searcher = ((SearchResultHeader) value).searcher();
+
+					final Container parent = getParent();
+
 					final JCheckBox headerBox = //
 						new JCheckBox(searcher.title(), searchService.enabled(searcher));
 					headerBox.setFont(smaller(headerBox.getFont(), 2));
-					headerBox.setBackground(parent.getBackground());
+					if (parent != null) headerBox.setBackground(parent.getBackground());
 					headerCheckboxes.put(searcher.getClass(), headerBox);
 
 					final JPanel headerInnerPane = new JPanel();
 					headerInnerPane.setLayout(new GridLayout(1, 1));
 					headerInnerPane.add(headerBox);
-					headerInnerPane.setBackground(parent.getBackground());
+					if (parent != null) headerInnerPane.setBackground(parent.getBackground());
 
 					final JPanel headerOuterPane = new JPanel();
 					headerOuterPane.setLayout(new GridLayout(1, 1));
@@ -485,7 +489,7 @@ public class SwingSearchBar extends JTextField {
 			resultsList.addKeyListener(new SearchBarKeyAdapter());
 
 			// uncomment the following lines to hide the JSplitPane divider borders
-//			Border border = new CompoundBorder(new LineBorder(parent.getBackground(), 1), new LineBorder(parent.getBackground(), 5));
+//			Border border = new CompoundBorder(new LineBorder(getParent().getBackground(), 1), new LineBorder(getParent().getBackground(), 5));
 //			UIManager.put("SplitPaneDivider.border", border);
 			final JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
 			splitPane.setLeftComponent(resultsPane);

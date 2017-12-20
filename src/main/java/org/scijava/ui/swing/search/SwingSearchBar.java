@@ -109,7 +109,6 @@ public class SwingSearchBar extends JTextField {
 	private static final Color SEARCHBAR_FONT_DEFAULT_COLOR = new Color(150, 150, 150);
 
 	private static final Color SELECTED_COLOR = new Color(70, 152, 251);
-	private static final Color HEADER_COLOR = new Color(234, 234, 234);
 	private static final int ICON_SIZE = 16;
 	private static final int PAD = 5;
 

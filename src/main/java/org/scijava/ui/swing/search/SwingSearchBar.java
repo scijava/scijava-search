@@ -125,7 +125,7 @@ public class SwingSearchBar extends JTextField {
 	
 	private DocumentListener documentListener;
 	
-	private final JButton exitBtn;
+	private final JButton exitButton;
 	
 	private String searchTerm;
 
@@ -177,10 +177,10 @@ public class SwingSearchBar extends JTextField {
 
 		});
 		
-		exitBtn = new JButton("🞩");
-		exitBtn.setBackground(new Color(255,255,255));
-		exitBtn.setBorder(BorderFactory.createLineBorder(new Color(255,255,255),5));
-		exitBtn.addActionListener(ae -> {
+		exitButton = new JButton("🞩");
+		exitButton.setBackground(new Color(255,255,255));
+		exitButton.setBorder(BorderFactory.createLineBorder(new Color(255,255,255),5));
+		exitButton.addActionListener(ae -> {
 			reset();
 			loseFocus();
 		});
@@ -480,7 +480,7 @@ public class SwingSearchBar extends JTextField {
 				}
 			});
 			
-			detailsPane.add(exitBtn, "pos n 0 100% n");
+			detailsPane.add(exitButton, "pos n 0 100% n");
 			detailsPane.add(detailsTitle,"growx, pad 0 0 0 -20");
 			detailsPane.add(detailsScrollPane, "growx, hmin 0, wmin 0");
 			detailsPane.add(detailsButtons, "growx");

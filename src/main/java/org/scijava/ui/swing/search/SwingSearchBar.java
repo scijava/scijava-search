@@ -41,12 +41,10 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
 import java.net.URL;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -296,6 +294,8 @@ public class SwingSearchBar extends JTextField {
 		private final Map<Class<?>, SearchEvent> allResults;
 		private final Map<Class<?>, JCheckBox> headerCheckboxes;
 		private final JList<SearchResult> resultsList;
+		
+		private SearchResult selected = null;
 
 		public SwingSearchPanel() {
 			
@@ -317,13 +317,13 @@ public class SwingSearchBar extends JTextField {
 					final JCheckBox headerBox = //
 						new JCheckBox(searcher.title(), searchService.enabled(searcher));
 					headerBox.setFont(smaller(headerBox.getFont(), 2));
-					headerBox.setBackground(HEADER_COLOR);
+					headerBox.setBackground(parent.getBackground());
 					headerCheckboxes.put(searcher.getClass(), headerBox);
 
 					final JPanel headerInnerPane = new JPanel();
 					headerInnerPane.setLayout(new GridLayout(1, 1));
 					headerInnerPane.add(headerBox);
-					headerInnerPane.setBackground(HEADER_COLOR);
+					headerInnerPane.setBackground(parent.getBackground());
 
 					final JPanel headerOuterPane = new JPanel();
 					headerOuterPane.setLayout(new GridLayout(1, 1));
@@ -349,6 +349,10 @@ public class SwingSearchBar extends JTextField {
 			final JScrollPane resultsPane = new JScrollPane(resultsList);
 			resultsPane.setHorizontalScrollBarPolicy(
 				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+			// uncomment to move scrollbar to the left
+//			resultsPane.setVerticalScrollBarPolicy(
+//					ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+//			resultsPane.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
 			resultsPane.setBorder(null);
 
 			final JPanel detailsPane = new JPanel();
@@ -356,26 +360,54 @@ public class SwingSearchBar extends JTextField {
 			final JPanel detailsProps = new JPanel();
 			final JScrollPane detailsScrollPane = new JScrollPane(detailsProps);
 			final JPanel detailsButtons = new JPanel();
-			
+
 			detailsScrollPane.setHorizontalScrollBarPolicy(
 					ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 			detailsScrollPane.setBorder(null);
-			
+
 			detailsProps.setLayout(new MigLayout("wrap 1, ins 0, wmin 0, hmin 0", "[grow]", ""));
 			detailsButtons.setLayout(new MigLayout("fill, ins " + PAD + " 0 0 0"));
 			detailsPane.setLayout(new MigLayout("wrap, ins 0 " + PAD + " " + PAD + " " + PAD + ", fill, wmin 0, hmin 0, hmax 100%, wmax 100%",
 					"[grow]", "[fill][fill,grow][fill]"));
 
+			resultsList.addMouseListener(new MouseAdapter() {
+				@Override
+				public void mouseClicked( MouseEvent e ) {
+					final SearchResult result = resultsList.getSelectedValue();
+					if (result == null || isHeader(result)) {
+						if (result != null) {
+							final Searcher searcher = ((SearchResultHeader) result).searcher();
+							searchService.setEnabled(searcher, !searchService.enabled(searcher));
+							SwingSearchBar.this.search();
+						}
+					}
+				}
+			});
+
+			resultsList.addMouseMotionListener(new MouseMotionAdapter() {
+				@Override
+				public void mouseMoved( MouseEvent e ) {
+					int index = resultsList.locationToIndex(e.getPoint());
+					SearchResult _selected = resultsList.getModel().getElementAt(index);
+					if(selected != _selected) {
+						selected = _selected;
+						if(selected != null && !isHeader(selected)) {
+							resultsList.setSelectedValue(selected, false);
+						}
+					}
+				}
+			});
+
 			resultsList.addListSelectionListener(lse -> {
 				if (lse.getValueIsAdjusting()) return;
 				final SearchResult result = resultsList.getSelectedValue();
 				if (result == null || isHeader(result)) {
-					if (result != null) {
-						final Searcher searcher = ((SearchResultHeader) result).searcher();
-						searchService.setEnabled(searcher, !searchService.enabled(searcher));
-						SwingSearchBar.this.search();
+					if(result != null){
+						threadService.queue(() -> {
+							down();
+						});
+						return;
 					}
-
 					// clear details pane
 					detailsTitle.setText("");
 					detailsProps.removeAll();
@@ -490,7 +522,7 @@ public class SwingSearchBar extends JTextField {
 
 		private void select(final Function<Integer, Integer> stepper) {
 			assertDispatchThread();
-			if (rowCount() == 0) return;
+			if (resultCount() == 0) return;
 			// Step through the list, skipping headers.
 			int index = resultsList.getSelectedIndex();
 			do {
@@ -502,6 +534,15 @@ public class SwingSearchBar extends JTextField {
 
 		private int rowCount() {
 			return resultsList.getModel().getSize();
+		}
+		
+		private int resultCount() {
+			int count = 0;
+			for(int i = 0; i < resultsList.getModel().getSize(); i++){
+				SearchResult result = resultsList.getModel().getElementAt(i);
+				if(!isHeader(result)) count++;
+			}
+			return count;
 		}
 
 		private Font smaller(Font font, int decrement) {

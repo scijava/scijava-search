@@ -52,7 +52,7 @@ public interface Searcher extends SciJavaPlugin {
 	String title();
 
 	/** Whether this plugin supports a search of this term. */
-	default boolean supports(final String term) {
+	default boolean supports(@SuppressWarnings("unused") final String term) {
 		return true;
 	}
 

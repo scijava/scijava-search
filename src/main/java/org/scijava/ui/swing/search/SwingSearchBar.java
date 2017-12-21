@@ -253,12 +253,14 @@ public class SwingSearchBar extends JTextField {
 		final int x = w.getLocation().x;
 		final int y = w.getLocation().y + w.getHeight() + 1;
 		dialog.setLocation(x, y);
+		dialog.setFocusableWindowState(false);
 		threadService.queue(() -> {
 			dialog.setVisible(true);
 			try { Thread.sleep(100); }
 			catch (InterruptedException exc) {}
 			grabFocus();
 			requestFocus();
+			dialog.setFocusableWindowState(true);
 		});
 	}
 

@@ -106,7 +106,7 @@ public class ImageJForumSearcher extends AbstractWebSearcher {
 		final String details)
 	{
 		getSearchResults().add(new ImageJForumSearchResult(name, //
-			iconPath == null || iconPath.isEmpty() ? "/icons/world_link.png"
+			iconPath == null || iconPath.isEmpty() ? "/icons/search/world_link.png"
 				: iconPath, url, metaInfo, details));
 	}
 

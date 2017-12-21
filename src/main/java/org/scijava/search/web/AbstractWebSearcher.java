@@ -67,7 +67,7 @@ public abstract class AbstractWebSearcher implements Searcher {
 		final String url, final String details)
 	{
 		searchResults.add(new WebSearchResult(name, //
-			iconPath == null || iconPath.isEmpty() ? "/icons/world_link.png"
+			iconPath == null || iconPath.isEmpty() ? "/icons/search/world_link.png"
 				: iconPath, url, details));
 	}
 

@@ -614,8 +614,18 @@ public class SwingSearchBar extends JTextField {
 		/** Executes the default search action. */
 		private void execute() {
 			assertDispatchThread();
-			final SearchResult result = resultsList.getSelectedValue();
-			if (result == null) return;
+
+			// Figure out which result to execute.
+			final SearchResult result;
+			final SearchResult selectedResult = resultsList.getSelectedValue();
+			if (selectedResult == null) {
+				// Nothing is selected; use the first result on the list.
+				final int firstResultIndex = firstResultIndex();
+				if (firstResultIndex < 0) return; // no results available
+				result = result(firstResultIndex);
+			}
+			else result = selectedResult;
+
 			final List<SearchAction> actions = searchService.actions(result);
 			if (actions.isEmpty()) return;
 			threadService.run(() -> actions.get(0).run());

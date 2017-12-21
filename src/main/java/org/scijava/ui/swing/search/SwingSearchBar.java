@@ -671,7 +671,6 @@ public class SwingSearchBar extends JTextField {
 		}
 
 		private Component icon(final String iconPath) {
-			// TODO make icon() return URL, not String.
 			if (iconPath == null || iconPath.isEmpty()) return emptyIcon();
 			final URL iconURL = getClass().getResource(iconPath);
 			if (iconURL == null) return emptyIcon();

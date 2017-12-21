@@ -204,9 +204,7 @@ public class SwingSearchBar extends JTextField {
 
 	/** Sets the maximum number of results per search category. */
 	public void setResultLimit(final int resultLimit) {
-		if (resultLimit <= 0) {
-			throw new IllegalArgumentException("Limit must be positive");
-		}
+		if (resultLimit <= 0) return; // Ignore invalid limit.
 		this.resultLimit = resultLimit;
 	}
 

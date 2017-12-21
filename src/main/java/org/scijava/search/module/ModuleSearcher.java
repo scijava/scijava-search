@@ -76,7 +76,12 @@ public class ModuleSearcher implements Searcher {
 
 		final LinkedHashSet<ModuleInfo> matches = new LinkedHashSet<>();
 
-		final List<ModuleInfo> modules = moduleService.getModules();
+		// Get the list of all enabled, visible, valid modules.
+		final List<ModuleInfo> modules = moduleService.getModules().stream() //
+			.filter(ModuleInfo::isEnabled) //
+			.filter(ModuleInfo::isVisible) //
+			.filter(ModuleInfo::isValid) //
+			.collect(Collectors.toList());
 
 		final String textLower = text.toLowerCase();
 

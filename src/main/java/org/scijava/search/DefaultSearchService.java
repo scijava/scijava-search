@@ -32,6 +32,7 @@ package org.scijava.search;
 import org.scijava.plugin.AbstractSingletonService;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
+import org.scijava.plugin.PluginInfo;
 import org.scijava.prefs.PrefService;
 import org.scijava.service.Service;
 
@@ -50,9 +51,12 @@ public class DefaultSearchService extends
 
 	@Override
 	public boolean enabled(final Searcher s) {
-		final boolean defaultValue = //
-			pluginService().getPlugin(s.getClass()).isEnabled();
-		return prefService.getBoolean(s.getClass(), "enabled", defaultValue);
+		final String enabled = prefService.get(s.getClass(), "enabled");
+		if (enabled != null) return Boolean.valueOf(enabled);
+		// Get the default value from enabled property of PluginInfo.
+		final PluginInfo<Searcher> info = //
+			pluginService().getPlugin(s.getClass(), Searcher.class);
+		return info == null ? false : info.isEnabled();
 	}
 
 	@Override

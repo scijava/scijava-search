@@ -47,7 +47,7 @@ import org.scijava.search.Searcher;
  *
  * @author Robert Haase (MPI-CBG)
  */
-@Plugin(type = Searcher.class, name = "ImageJ Forum")
+@Plugin(type = Searcher.class, name = "ImageJ Forum", enabled = false)
 public class ImageJForumSearcher extends AbstractWebSearcher {
 
 	@Parameter

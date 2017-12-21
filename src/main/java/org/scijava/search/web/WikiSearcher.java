@@ -54,7 +54,7 @@ import org.xml.sax.SAXException;
  *
  * @author Robert Haase (MPI-CBG)
  */
-@Plugin(type = Searcher.class, name = "ImageJ Wiki")
+@Plugin(type = Searcher.class, name = "ImageJ Wiki", enabled = false)
 public class WikiSearcher extends AbstractWebSearcher {
 
 	@Parameter

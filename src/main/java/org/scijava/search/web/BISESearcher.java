@@ -52,7 +52,7 @@ import org.xml.sax.SAXException;
  *
  * @author Robert Haase (MPI-CBG)
  */
-//@Plugin(type = Searcher.class, name = "BISE")
+//@Plugin(type = Searcher.class, name = "BISE", enabled = false)
 public class BISESearcher extends AbstractWebSearcher {
 
 	@Parameter

@@ -109,6 +109,9 @@ public class SwingSearchBar extends JTextField {
 	private static final int ICON_SIZE = 16;
 	private static final int PAD = 5;
 
+	private final DocumentListener documentListener;
+	private final JButton closeButton;
+
 	@Parameter
 	private SearchService searchService;
 
@@ -118,11 +121,8 @@ public class SwingSearchBar extends JTextField {
 	@Parameter
 	private PluginService pluginService;
 
+	/** Currently active search panel. */
 	private SwingSearchPanel searchPanel;
-
-	private final DocumentListener documentListener;
-
-	private final JButton closeButton;
 
 	/** Currently active text search. */
 	private String searchText;

@@ -103,12 +103,9 @@ import org.scijava.thread.ThreadService;
 public class SwingSearchBar extends JTextField {
 
 	private static final String DEFAULT_MESSAGE = "Click here to search";
-
-	private static final Color SEARCHBAR_FONT_COLOR = new Color(0, 0, 0);
-	private static final Color SEARCHBAR_FONT_DEFAULT_COLOR = new Color(150, 150,
-		150);
-
-	private static final Color SELECTED_COLOR = new Color(70, 152, 251);
+	private static final Color ACTIVE_FONT_COLOR = new Color(0, 0, 0);
+	private static final Color INACTIVE_FONT_COLOR = new Color(150, 150, 150);
+	private static final Color SELECTED_RESULT_COLOR = new Color(70, 152, 251);
 	private static final int ICON_SIZE = 16;
 	private static final int PAD = 5;
 
@@ -136,7 +133,7 @@ public class SwingSearchBar extends JTextField {
 		super(DEFAULT_MESSAGE, 12);
 		context.inject(this);
 		setText(DEFAULT_MESSAGE);
-		setForeground(SEARCHBAR_FONT_DEFAULT_COLOR);
+		setForeground(INACTIVE_FONT_COLOR);
 
 		setBorder(BorderFactory.createCompoundBorder(BorderFactory
 			.createEmptyBorder(), BorderFactory.createEmptyBorder(5, 5, 5, 5)));
@@ -167,7 +164,7 @@ public class SwingSearchBar extends JTextField {
 			@Override
 			public void focusGained(final FocusEvent e) {
 				if (DEFAULT_MESSAGE.equals(getText())) setText("");
-				setForeground(SEARCHBAR_FONT_COLOR);
+				setForeground(ACTIVE_FONT_COLOR);
 			}
 
 			@Override
@@ -306,7 +303,7 @@ public class SwingSearchBar extends JTextField {
 			loseFocus();
 			getDocument().removeDocumentListener(documentListener);
 			setText(DEFAULT_MESSAGE);
-			setForeground(SEARCHBAR_FONT_DEFAULT_COLOR);
+			setForeground(INACTIVE_FONT_COLOR);
 			getDocument().addDocumentListener(documentListener);
 		}
 		else {
@@ -377,7 +374,7 @@ public class SwingSearchBar extends JTextField {
 				name.setEditable(false);
 				name.setBackground(null);
 				item.add(name);
-				item.setBackground(isSelected ? SELECTED_COLOR : list.getBackground());
+				item.setBackground(isSelected ? SELECTED_RESULT_COLOR : list.getBackground());
 				return item;
 			});
 			resultsList.setBorder(new EmptyBorder(0, 0, 0, 0));

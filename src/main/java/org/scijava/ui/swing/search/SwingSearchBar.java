@@ -124,10 +124,11 @@ public class SwingSearchBar extends JTextField {
 
 	private final JButton closeButton;
 
+	/** Currently active text search. */
+	private String searchText;
+
 	/** The maximum number of results per search category. */
 	private int resultLimit = 8;
-
-	private String searchTerm;
 
 	public SwingSearchBar(final Context context) {
 		super(DEFAULT_MESSAGE, 12);
@@ -454,14 +455,14 @@ public class SwingSearchBar extends JTextField {
 				else {
 					// populate details pane
 					detailsTitle.setText("<html><h2>" + highlightSearchUnderline(
-						escapeHtml(result.name()), searchTerm) + "</h2>");
+						escapeHtml(result.name()), searchText) + "</h2>");
 					detailsProps.removeAll();
 					result.properties().forEach((k, v) -> {
 						if (v != "") {
 							if (k == null) {
 								final JTextPane textPane = new JTextPane();
 								textPane.setContentType("text/html");
-								textPane.setText(highlightSearchBold(v, searchTerm));
+								textPane.setText(highlightSearchBold(v, searchText));
 								final Font font = UIManager.getFont("Label.font");
 								final String bodyRule = "body { font-family: " + font
 									.getFamily() + "; " + "font-size: " + font.getSize() +
@@ -540,7 +541,7 @@ public class SwingSearchBar extends JTextField {
 
 		public void search(final String text) {
 			assertDispatchThread();
-			searchTerm = text;
+			searchText = text;
 			operation.search(text.toLowerCase());
 		}
 
@@ -639,7 +640,7 @@ public class SwingSearchBar extends JTextField {
 			resultsList.setModel(listModel);
 
 			// TODO: Improve retainment of previous selection.
-			if (!searchTerm.isEmpty()) {
+			if (!searchText.isEmpty()) {
 				if (previous == null) {
 					if (listModel.getSize() > 0) {
 						resultsList.setSelectedIndex(firstResultIndex());

@@ -37,6 +37,6 @@ package org.scijava.search;
  */
 public interface SearchListener {
 
-	/** TODO */
+	/** Invoked when a search is completed. */
 	void searchCompleted(SearchEvent event);
 }

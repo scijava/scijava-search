@@ -69,10 +69,10 @@ public interface SearchService extends SingletonService<SearchActionFactory>,
 			.map(factory -> factory.create(result)).collect(Collectors.toList());
 	}
 
-	/** TODO javadoc */
+	/** Gets whether the given searcher plugin is currently enabled. */
 	boolean enabled(Searcher s);
 
-	/** TODO javadoc */
+	/** Enables or disables the given searcher plugin. */
 	void setEnabled(Searcher s, boolean enabled);
 
 	@Override

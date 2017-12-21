@@ -32,7 +32,12 @@ package org.scijava.search;
 import org.scijava.plugin.FactoryPlugin;
 
 /**
- * TODO
+ * SciJava plugin type for doing something with a {@link SearchResult}.
+ * <p>
+ * For example, {@code RunModuleSearchActionFactory} creates a
+ * {@link SearchAction} that executes the SciJava module described by a
+ * {@code ModuleSearchResult}.
+ * </p>
  *
  * @author Curtis Rueden
  */

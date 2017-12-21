@@ -32,7 +32,7 @@ package org.scijava.plugin;
 import org.scijava.Typed;
 
 /**
- * TODO
+ * Interface for plugins that act as factories, creating objects on demand.
  *
  * @author Curtis Rueden
  * @param <D> Source data type.

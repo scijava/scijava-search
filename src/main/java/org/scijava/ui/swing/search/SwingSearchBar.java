@@ -560,7 +560,7 @@ public class SwingSearchBar extends JTextField {
 		public void search(final String text) {
 			assertDispatchThread();
 			searchText = text;
-			operation.search(text.toLowerCase());
+			operation.search(text);
 		}
 
 		// -- Helper methods --

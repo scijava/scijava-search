@@ -131,6 +131,9 @@ public class SwingSearchBar extends JTextField {
 	/** The maximum number of results per search category. */
 	private int resultLimit = 8;
 
+	/** Whether the selection should change upon mouseover. */
+	private boolean mouseoverEnabled;
+
 	public SwingSearchBar(final Context context) {
 		super(DEFAULT_MESSAGE, 12);
 		context.inject(this);
@@ -205,6 +208,16 @@ public class SwingSearchBar extends JTextField {
 			throw new IllegalArgumentException("Limit must be positive");
 		}
 		this.resultLimit = resultLimit;
+	}
+
+	/** Gets whether the selection should change upon mouseover. */
+	public boolean isMouseoverEnabled() {
+		return mouseoverEnabled;
+	}
+
+	/** Sets whether the selection should change upon mouseover. */
+	public void setMouseoverEnabled(final boolean mouseoverEnabled) {
+		this.mouseoverEnabled = mouseoverEnabled;
 	}
 
 	// -- Utility methods --
@@ -324,8 +337,6 @@ public class SwingSearchBar extends JTextField {
 		private final Map<Class<?>, JCheckBox> headerCheckboxes;
 		private final JList<SearchResult> resultsList;
 
-		private SearchResult selected = null;
-
 		public SwingSearchPanel() {
 			setLayout(new BorderLayout());
 			setPreferredSize(new Dimension(800, 300));
@@ -422,21 +433,25 @@ public class SwingSearchBar extends JTextField {
 				}
 			});
 
-			resultsList.addMouseMotionListener(new MouseMotionAdapter() {
+			if (mouseoverEnabled) {
+				resultsList.addMouseMotionListener(new MouseMotionAdapter() {
 
-				@Override
-				public void mouseMoved(final MouseEvent e) {
-					final int index = resultsList.locationToIndex(e.getPoint());
-					final SearchResult _selected = resultsList.getModel().getElementAt(
-						index);
-					if (selected != _selected) {
-						selected = _selected;
-						if (selected != null && !isHeader(selected)) {
-							resultsList.setSelectedValue(selected, false);
+					private SearchResult lastSelected;
+
+					@Override
+					public void mouseMoved(final MouseEvent e) {
+						final int index = resultsList.locationToIndex(e.getPoint());
+						final SearchResult selected = //
+							resultsList.getModel().getElementAt(index);
+						if (lastSelected != selected) {
+							lastSelected = selected;
+							if (lastSelected != null && !isHeader(lastSelected)) {
+								resultsList.setSelectedValue(lastSelected, false);
+							}
 						}
 					}
-				}
-			});
+				});
+			}
 
 			resultsList.addListSelectionListener(lse -> {
 				if (lse.getValueIsAdjusting()) return;

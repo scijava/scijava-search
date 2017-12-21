@@ -83,8 +83,7 @@ public class SnippetSearchResult implements SearchResult {
 
 	@Override
 	public String iconPath() {
-		return null;
-//		return "/icons/" + language.getNames().get(0);
+		return "/icons/search/code.png";
 	}
 
 	@Override

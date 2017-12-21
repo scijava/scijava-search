@@ -51,11 +51,6 @@ public interface Searcher extends SciJavaPlugin {
 	 */
 	String title();
 
-	/** Whether this plugin is currently enabled to do searches. */
-	default boolean enabled() {
-		return true;
-	}
-
 	/** Whether this plugin supports a search of this term. */
 	default boolean supports(final String term) {
 		return true;

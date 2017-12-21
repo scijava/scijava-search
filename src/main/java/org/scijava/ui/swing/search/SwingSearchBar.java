@@ -122,7 +122,7 @@ public class SwingSearchBar extends JTextField {
 
 	private final DocumentListener documentListener;
 
-	private final JButton exitButton;
+	private final JButton closeButton;
 
 	/** The maximum number of results per search category. */
 	private int resultLimit = 8;
@@ -175,11 +175,10 @@ public class SwingSearchBar extends JTextField {
 			}
 		});
 
-		exitButton = new JButton("\u2612");
-		exitButton.setBackground(new Color(255, 255, 255));
-		exitButton.setBorder(BorderFactory.createLineBorder(new Color(255, 255,
-			255), 5));
-		exitButton.addActionListener(ae -> {
+		closeButton = new JButton("<html><span style=\"font-size: 2.5em\">\u2612</span>");
+		closeButton.setToolTipText("Close the search results pane");
+		closeButton.setBorder(null);
+		closeButton.addActionListener(ae -> {
 			reset();
 			loseFocus();
 		});
@@ -520,7 +519,7 @@ public class SwingSearchBar extends JTextField {
 				}
 			});
 
-			detailsPane.add(exitButton, "pos n 0 100% n");
+			detailsPane.add(closeButton, "pos n 0 100% n");
 			detailsPane.add(detailsTitle, "growx, pad 0 0 0 -20");
 			detailsPane.add(detailsScrollPane, "growx, hmin 0, wmin 0");
 			detailsPane.add(detailsButtons, "growx");

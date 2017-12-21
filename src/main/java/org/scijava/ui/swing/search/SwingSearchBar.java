@@ -103,7 +103,6 @@ import org.scijava.thread.ThreadService;
 public class SwingSearchBar extends JTextField {
 
 	private static final String DEFAULT_MESSAGE = "Click here to search";
-	private static final int MAX_RESULTS = 8;
 
 	private static final Color SEARCHBAR_FONT_COLOR = new Color(0, 0, 0);
 	private static final Color SEARCHBAR_FONT_DEFAULT_COLOR = new Color(150, 150,
@@ -127,6 +126,9 @@ public class SwingSearchBar extends JTextField {
 	private final DocumentListener documentListener;
 
 	private final JButton exitButton;
+
+	/** The maximum number of results per search category. */
+	private int resultLimit = 8;
 
 	private String searchTerm;
 
@@ -192,6 +194,19 @@ public class SwingSearchBar extends JTextField {
 			setText("");
 			requestFocus();
 		});
+	}
+
+	/** Gets the maximum number of results per search category. */
+	public int getResultLimit() {
+		return resultLimit;
+	}
+
+	/** Sets the maximum number of results per search category. */
+	public void setResultLimit(final int resultLimit) {
+		if (resultLimit <= 0) {
+			throw new IllegalArgumentException("Limit must be positive");
+		}
+		this.resultLimit = resultLimit;
 	}
 
 	// -- Utility methods --
@@ -615,9 +630,9 @@ public class SwingSearchBar extends JTextField {
 
 				if (completeResults.isEmpty()) continue;
 
-				// Limit to the top MAX_RESULTS matches only.
+				// Limit to the top matches only.
 				final List<SearchResult> results = completeResults.stream() //
-					.limit(MAX_RESULTS).collect(Collectors.toList());
+					.limit(resultLimit).collect(Collectors.toList());
 
 				// Add results as entries.
 				for (final SearchResult result : results) {

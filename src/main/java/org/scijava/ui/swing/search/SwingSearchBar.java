@@ -99,6 +99,7 @@ import org.scijava.thread.ThreadService;
  * Swing-based search bar for an application window.
  *
  * @author Curtis Rueden
+ * @author Deborah Schmidt
  */
 public class SwingSearchBar extends JTextField {
 

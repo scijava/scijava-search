@@ -100,7 +100,6 @@ import org.scijava.thread.ThreadService;
  *
  * @author Curtis Rueden
  */
-
 public class SwingSearchBar extends JTextField {
 
 	private static final String DEFAULT_MESSAGE = "Click here to search";
@@ -315,7 +314,6 @@ public class SwingSearchBar extends JTextField {
 		private SearchResult selected = null;
 
 		public SwingSearchPanel() {
-
 			setLayout(new BorderLayout());
 			setPreferredSize(new Dimension(800, 300));
 			setBorder(BorderFactory.createEmptyBorder());
@@ -594,7 +592,6 @@ public class SwingSearchBar extends JTextField {
 		}
 
 		private void rebuild() {
-
 			assertDispatchThread();
 
 			final SearchResult previous = resultsList.getSelectedValue();
@@ -607,7 +604,6 @@ public class SwingSearchBar extends JTextField {
 			// Build the new list model.
 			final DefaultListModel<SearchResult> listModel = new DefaultListModel<>();
 			for (final Searcher searcher : searchers) {
-
 				// Look up the results list.
 				final List<SearchResult> completeResults = //
 					allResults.get(searcher.getClass()).results();

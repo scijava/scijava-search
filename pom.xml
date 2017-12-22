@@ -10,7 +10,7 @@
 	</parent>
 
 	<artifactId>scijava-search</artifactId>
-	<version>0.1.1-SNAPSHOT</version>
+	<version>0.2.0-SNAPSHOT</version>
 
 	<name>SciJava Search</name>
 	<description>Search framework for SciJava applications.</description>
@@ -90,7 +90,7 @@
 		<!-- NB: Deploy releases to the ImageJ Maven repository. -->
 		<releaseProfiles>deploy-to-imagej</releaseProfiles>
 
-		<scijava-common.version>2.68.0</scijava-common.version>
+		<scijava-common.version>2.69.0</scijava-common.version>
 	</properties>
 
 	<repositories>

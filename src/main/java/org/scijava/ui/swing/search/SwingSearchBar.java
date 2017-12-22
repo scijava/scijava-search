@@ -228,23 +228,6 @@ public class SwingSearchBar extends JTextField {
 		buttons.add(button);
 	}
 
-	// -- Utility methods --
-
-	// TODO: Move this method to PluginService.
-	public <PT extends SciJavaPlugin> void sort(final List<PT> instances,
-		final Class<PT> type)
-	{
-		// Create a mapping from plugin classes to priorities.
-		final List<PluginInfo<PT>> plugins = pluginService.getPluginsOfType(type);
-		final Map<Class<?>, PluginInfo<PT>> infos = plugins.stream().collect(//
-			Collectors.toMap(PluginInfo::getPluginClass, Function.identity()));
-
-		// Compare plugin instances by priority via the mapping.
-		final Comparator<PT> comparator = (o1, o2) -> Priority.compare(//
-			infos.get(o1.getClass()), infos.get(o2.getClass()));
-		Collections.sort(instances, comparator);
-	}
-
 	// -- Internal methods --
 
 	/** Called on the EDT when the search panel wants to appear. */
@@ -653,7 +636,7 @@ public class SwingSearchBar extends JTextField {
 			// Gets list of Searchers, sorted by priority.
 			final List<Searcher> searchers = allResults.values().stream().map(
 				event -> event.searcher()).collect(Collectors.toList());
-			sort(searchers, Searcher.class);
+			pluginService.sort(searchers, Searcher.class);
 
 			// Build the new list model.
 			final DefaultListModel<SearchResult> listModel = new DefaultListModel<>();

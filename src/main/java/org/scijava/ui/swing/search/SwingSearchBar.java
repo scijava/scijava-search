@@ -116,9 +116,6 @@ public class SwingSearchBar extends JTextField {
 	private final JToolBar buttons;
 
 	@Parameter
-	private SearchService searchService;
-
-	@Parameter
 	private ThreadService threadService;
 
 	@Parameter
@@ -311,7 +308,7 @@ public class SwingSearchBar extends JTextField {
 				// NB: Defer creating a new search dialog until something is typed.
 				return;
 			}
-			searchPanel = new SwingSearchPanel(); // Spawns the SearchOperation!
+			searchPanel = new SwingSearchPanel(threadService.context());
 			showPanel(searchPanel);
 		}
 		searchPanel.search(getText());
@@ -350,7 +347,11 @@ public class SwingSearchBar extends JTextField {
 		private final Map<Class<?>, JCheckBox> headerCheckboxes;
 		private final JList<SearchResult> resultsList;
 
-		public SwingSearchPanel() {
+		@Parameter
+		private SearchService searchService;
+
+		public SwingSearchPanel(final Context context) {
+			context.inject(this);
 			setLayout(new BorderLayout());
 			setPreferredSize(new Dimension(800, 300));
 			setBorder(BorderFactory.createEmptyBorder());

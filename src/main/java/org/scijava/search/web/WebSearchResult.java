@@ -29,7 +29,7 @@
 
 package org.scijava.search.web;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.scijava.search.SearchResult;
@@ -40,21 +40,39 @@ import org.scijava.search.SearchResult;
  * text from the website as preview of its content.
  *
  * @author Robert Haase (MPI-CBG)
+ * @author Curtis Rueden
  */
 public class WebSearchResult implements SearchResult {
 
-	protected final String details;
-	String name;
-	String iconPath;
-	String url;
+	private static final String DEFAULT_ICON = "/icons/search/world_link.png";
 
-	public WebSearchResult(final String name, final String iconPath,
-		final String url, final String details)
+	private final String name;
+	private final String iconPath;
+	private final String url;
+	private final Map<String, String> props;
+
+	public WebSearchResult(final String name, final String url,
+		final String details)
+	{
+		this(name, url, details, null, null);
+	}
+
+	public WebSearchResult(final String name, final String url,
+		final String details, final String iconPath,
+		final Map<String, String> extraProps)
 	{
 		this.name = name;
-		this.iconPath = iconPath;
 		this.url = url;
-		this.details = details;
+		this.iconPath = iconPath == null ? DEFAULT_ICON : iconPath;
+
+		props = new LinkedHashMap<>();
+		props.put(null, details);
+		props.put("URL", url);
+		if (extraProps != null) props.putAll(extraProps);
+	}
+
+	public String url() {
+		return url;
 	}
 
 	@Override
@@ -67,17 +85,8 @@ public class WebSearchResult implements SearchResult {
 		return iconPath;
 	}
 
-	public String details() {
-		return details;
-	}
-
 	@Override
 	public Map<String, String> properties() {
-		final HashMap<String, String> properties = new HashMap<>();
-//		properties.put("name", name);
-//		properties.put("iconpath", iconPath);
-		properties.put("url", url);
-		properties.put(null, details);
-		return properties;
+		return props;
 	}
 }

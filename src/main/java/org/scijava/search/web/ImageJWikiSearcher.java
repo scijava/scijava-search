@@ -32,12 +32,14 @@ package org.scijava.search.web;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.scijava.Priority;
 import org.scijava.log.LogService;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
@@ -54,18 +56,27 @@ import org.xml.sax.SAXException;
  *
  * @author Robert Haase (MPI-CBG)
  */
-@Plugin(type = Searcher.class, name = "ImageJ Wiki", enabled = false)
-public class WikiSearcher extends AbstractWebSearcher {
+@Plugin(type = Searcher.class, priority = Priority.HIGH, enabled = false)
+public class ImageJWikiSearcher implements Searcher {
+
+	private final ArrayList<SearchResult> searchResults = new ArrayList<>();
+
+	private String currentHeading;
+	private String currentLink;
+	private String currentContent;
 
 	@Parameter
 	private LogService log;
 
-	public WikiSearcher() {
-		super("ImageJ Wiki");
+	@Override
+	public String title() {
+		return "ImageJ Wiki";
 	}
 
 	@Override
 	public List<SearchResult> search(final String text, final boolean fuzzy) {
+		searchResults.clear();
+
 		try {
 			final URL url = new URL(
 				"http://imagej.net/index.php?title=Special%3ASearch&search=" +
@@ -87,16 +98,12 @@ public class WikiSearcher extends AbstractWebSearcher {
 			log.debug(e);
 		}
 
-		return getSearchResults();
+		return searchResults;
 	}
 
-	String currentHeading;
-	String currentLink;
-
 	private void parseHeading(final Node node) {
-
-		if (node.getTextContent() != null && node.getTextContent().trim()
-			.length() > 0)
+		if (node.getTextContent() != null && //
+			node.getTextContent().trim().length() > 0)
 		{
 			currentHeading = node.getTextContent();
 		}
@@ -110,12 +117,9 @@ public class WikiSearcher extends AbstractWebSearcher {
 		final NodeList nodeList = node.getChildNodes();
 		for (int i = 0; i < nodeList.getLength(); i++) {
 			final Node childNode = nodeList.item(i);
-
 			parseHeading(childNode);
 		}
 	}
-
-	String currentContent;
 
 	private void parseContent(final Node node) {
 		if (node.getTextContent() != null) {
@@ -125,14 +129,14 @@ public class WikiSearcher extends AbstractWebSearcher {
 		final NodeList nodeList = node.getChildNodes();
 		for (int i = 0; i < nodeList.getLength(); i++) {
 			final Node childNode = nodeList.item(i);
-
 			parse(childNode);
 		}
 	}
 
 	private void saveLastItem() {
 		if (currentHeading != null && currentHeading.length() > 0) {
-			addResult(currentHeading, "", currentLink, currentContent);
+			searchResults.add(new WebSearchResult(currentHeading, //
+				currentLink, currentContent));
 		}
 		currentHeading = "";
 		currentLink = "";
@@ -141,17 +145,15 @@ public class WikiSearcher extends AbstractWebSearcher {
 
 	private void parse(final Node node) {
 		if (node.getNodeName().equals("div")) {
-			final Node item = node.getAttributes() == null ? null : node
-				.getAttributes().getNamedItem("class");
+			final Node item = node.getAttributes() == null ? //
+				null : node.getAttributes().getNamedItem("class");
 			if (item != null && item.getNodeValue().equals(
 				"mw-search-result-heading"))
 			{
-
 				if (currentHeading != null) {
 					saveLastItem();
 				}
 				parseHeading(node);
-
 				return;
 			}
 			if (item != null && item.getNodeValue().equals("searchresult")) {
@@ -163,9 +165,7 @@ public class WikiSearcher extends AbstractWebSearcher {
 		final NodeList nodeList = node.getChildNodes();
 		for (int i = 0; i < nodeList.getLength(); i++) {
 			final Node childNode = nodeList.item(i);
-
 			parse(childNode);
 		}
-
 	}
 }

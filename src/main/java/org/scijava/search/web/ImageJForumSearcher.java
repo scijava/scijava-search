@@ -32,8 +32,16 @@ package org.scijava.search.web;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 
 import org.scijava.log.LogService;
@@ -47,18 +55,21 @@ import org.scijava.search.Searcher;
  *
  * @author Robert Haase (MPI-CBG)
  */
-@Plugin(type = Searcher.class, name = "ImageJ Forum", enabled = false)
-public class ImageJForumSearcher extends AbstractWebSearcher {
+@Plugin(type = Searcher.class, enabled = false)
+public class ImageJForumSearcher implements Searcher {
 
 	@Parameter
 	private LogService log;
 
-	public ImageJForumSearcher() {
-		super("ImageJ Forum");
+	@Override
+	public String title() {
+		return "ImageJ Forum";
 	}
 
 	@Override
 	public List<SearchResult> search(final String text, final boolean fuzzy) {
+		final ArrayList<SearchResult> searchResults = new ArrayList<>();
+
 		try {
 			final URL url = new URL("http://forum.imagej.net/search?q=" + //
 				URLEncoder.encode(text, "utf-8") + "&source=imagej");
@@ -66,9 +77,9 @@ public class ImageJForumSearcher extends AbstractWebSearcher {
 			try (final Scanner s = new Scanner(url.openStream())) {
 				s.useDelimiter("\"topics\":");
 
-				if (!s.hasNext()) return getSearchResults();
+				if (!s.hasNext()) return searchResults;
 				s.next();
-				if (!s.hasNext()) return getSearchResults();
+				if (!s.hasNext()) return searchResults;
 				webSearchContent = s.next();
 			}
 			webSearchContent = webSearchContent.substring(webSearchContent.indexOf(
@@ -85,32 +96,21 @@ public class ImageJForumSearcher extends AbstractWebSearcher {
 					"Created: " + metaInfo.get("created_at") + "<br />" +
 					"Last posted: " + metaInfo.get("last_posted_at");
 
-				addResult(metaInfo.get("title"), "", forumPostUrl, metaInfo, details);
+				final Map<String, String> extraProps = new LinkedHashMap<>();
+				extraProps.put("Tags", metaInfo.get("tags"));
+				extraProps.put("Created", formatDate(metaInfo.get("created_at")));
+				extraProps.put("Last posted", formatDate(metaInfo.get("last_posted_at")));
+				searchResults.add(new WebSearchResult(metaInfo.get("title"), //
+					forumPostUrl, details, null, extraProps));
 			}
 		}
 		catch (final IOException e) {
 			log.debug(e);
 		}
-		return getSearchResults();
+		return searchResults;
 	}
 
-	/**
-	 * @param name Resulting website title / name
-	 * @param iconPath path to an image representing the results
-	 * @param url URL of the found website
-	 * @param metaInfo
-	 * @param details some text from the website representing its content
-	 */
-	protected void addResult(final String name, final String iconPath,
-		final String url, final HashMap<String, String> metaInfo,
-		final String details)
-	{
-		getSearchResults().add(new ImageJForumSearchResult(name, //
-			iconPath == null || iconPath.isEmpty() ? "/icons/search/world_link.png"
-				: iconPath, url, metaInfo, details));
-	}
-
-	HashMap<String, String> parseForumSearchResult(String content) {
+	private HashMap<String, String> parseForumSearchResult(String content) {
 		content = content + ",";
 		final HashMap<String, String> map = new HashMap<>();
 		String currentKey = "";
@@ -162,4 +162,10 @@ public class ImageJForumSearcher extends AbstractWebSearcher {
 		return map;
 	}
 
+	private String formatDate(final String datestr) {
+		final Instant instant = Instant.parse(datestr);
+		final LocalDateTime result = LocalDateTime.ofInstant(instant, ZoneId.of(
+			ZoneOffset.UTC.getId()));
+		return result.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+	}
 }

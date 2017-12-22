@@ -32,6 +32,7 @@ package org.scijava.search.web;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -41,6 +42,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.scijava.log.LogService;
 import org.scijava.plugin.Parameter;
 import org.scijava.search.SearchResult;
+import org.scijava.search.Searcher;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -52,20 +54,28 @@ import org.xml.sax.SAXException;
  *
  * @author Robert Haase (MPI-CBG)
  */
-//@Plugin(type = Searcher.class, name = "BISE", enabled = false)
-public class BISESearcher extends AbstractWebSearcher {
+//@Plugin(type = Searcher.class, enabled = false)
+public class BISESearcher implements Searcher {
+
+	private final ArrayList<SearchResult> searchResults = new ArrayList<>();
+
+	private String currentHeading;
+	private String currentLink;
+	private String currentContent;
 
 	@Parameter
 	private LogService log;
 
-	public BISESearcher() {
-		super("BISE");
+	@Override
+	public String title() {
+		return "BISE";
 	}
 
 	@Override
 	public List<SearchResult> search(final String text, final boolean fuzzy) {
+		searchResults.clear();
+
 		try {
-			// URL url = new URL("file:///c:/structure/temp/biii.eu_search2.html");
 			final URL url = new URL("http://biii.eu/search?search_api_fulltext=" +
 				URLEncoder.encode(text, "utf-8") + "&source=imagej");
 
@@ -85,16 +95,12 @@ public class BISESearcher extends AbstractWebSearcher {
 		catch (final SAXException e) {
 			log.debug(e);
 		}
-		return getSearchResults();
+		return searchResults;
 	}
 
-	String currentHeading;
-	String currentLink;
-
 	private void parseHeading(final Node node) {
-
-		if (node.getTextContent() != null && node.getTextContent().trim()
-			.length() > 0)
+		if (node.getTextContent() != null && //
+			node.getTextContent().trim().length() > 0)
 		{
 			currentHeading = node.getTextContent();
 		}
@@ -108,12 +114,9 @@ public class BISESearcher extends AbstractWebSearcher {
 		final NodeList nodeList = node.getChildNodes();
 		for (int i = 0; i < nodeList.getLength(); i++) {
 			final Node childNode = nodeList.item(i);
-
 			parseHeading(childNode);
 		}
 	}
-
-	String currentContent;
 
 	private void parseContent(final Node node) {
 		if (node.getTextContent() != null) {
@@ -123,16 +126,14 @@ public class BISESearcher extends AbstractWebSearcher {
 		final NodeList nodeList = node.getChildNodes();
 		for (int i = 0; i < nodeList.getLength(); i++) {
 			final Node childNode = nodeList.item(i);
-
 			parse(childNode);
 		}
 	}
 
 	private void saveLastItem() {
 		if (currentHeading != null && currentHeading.length() > 0) {
-
-			addResult(currentHeading, "", currentLink, currentContent);
-
+			searchResults.add(new WebSearchResult(currentHeading, //
+				currentLink, currentContent));
 		}
 		currentHeading = "";
 		currentLink = "";
@@ -141,8 +142,8 @@ public class BISESearcher extends AbstractWebSearcher {
 
 	private void parse(final Node node) {
 		if (node.getNodeName().equals("div")) {
-			final Node item = node.getAttributes() == null ? null : node
-				.getAttributes().getNamedItem("class");
+			final Node item = node.getAttributes() == null ? //
+				null : node.getAttributes().getNamedItem("class");
 			if (item != null && item.getNodeValue().equals(
 				"views-field views-field-title"))
 			{
@@ -151,7 +152,6 @@ public class BISESearcher extends AbstractWebSearcher {
 					saveLastItem();
 				}
 				parseHeading(node);
-
 				return;
 			}
 			if (item != null && item.getNodeValue().equals(
@@ -165,10 +165,7 @@ public class BISESearcher extends AbstractWebSearcher {
 		final NodeList nodeList = node.getChildNodes();
 		for (int i = 0; i < nodeList.getLength(); i++) {
 			final Node childNode = nodeList.item(i);
-
 			parse(childNode);
 		}
-
 	}
-
 }

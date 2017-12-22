@@ -37,6 +37,7 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.Window;
+import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyAdapter;
@@ -71,6 +72,7 @@ import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
+import javax.swing.JToolBar;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
@@ -111,7 +113,7 @@ public class SwingSearchBar extends JTextField {
 	private static final int PAD = 5;
 
 	private final DocumentListener documentListener;
-	private final JButton closeButton;
+	private final JToolBar buttons;
 
 	@Parameter
 	private SearchService searchService;
@@ -180,13 +182,8 @@ public class SwingSearchBar extends JTextField {
 			}
 		});
 
-		closeButton = new JButton("<html><span style=\"font-size: 2.5em\">\u2612</span>");
-		closeButton.setToolTipText("Close the search results pane");
-		closeButton.setBorder(null);
-		closeButton.addActionListener(ae -> {
-			reset();
-			loseFocus();
-		});
+		buttons = new JToolBar();
+		buttons.setFloatable(false);
 	}
 
 	/** Called externally to bring the search bar into focus. */
@@ -195,6 +192,12 @@ public class SwingSearchBar extends JTextField {
 			setText("");
 			requestFocus();
 		});
+	}
+
+	/** Closes the search results pane. */
+	public void close() {
+		reset();
+		loseFocus();
 	}
 
 	/** Gets the maximum number of results per search category. */
@@ -216,6 +219,16 @@ public class SwingSearchBar extends JTextField {
 	/** Sets whether the selection should change upon mouseover. */
 	public void setMouseoverEnabled(final boolean mouseoverEnabled) {
 		this.mouseoverEnabled = mouseoverEnabled;
+	}
+
+	/** Adds a button to the search pane's toolbar. */
+	public void addButton(final String label, final String tooltip,
+		final ActionListener action)
+	{
+		final JButton button = new JButton(label);
+		if (tooltip != null) button.setToolTipText(tooltip);
+		if (action != null) button.addActionListener(action);
+		buttons.add(button);
 	}
 
 	// -- Utility methods --
@@ -536,7 +549,7 @@ public class SwingSearchBar extends JTextField {
 				}
 			});
 
-			detailsPane.add(closeButton, "pos n 0 100% n");
+			detailsPane.add(buttons, "pos n 0 100% n");
 			detailsPane.add(detailsTitle, "growx, pad 0 0 0 -20");
 			detailsPane.add(detailsScrollPane, "growx, hmin 0, wmin 0");
 			detailsPane.add(detailsButtons, "growx");

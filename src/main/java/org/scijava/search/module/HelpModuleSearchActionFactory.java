@@ -55,9 +55,9 @@ public class HelpModuleSearchActionFactory implements SearchActionFactory {
 
 	@Override
 	public SearchAction create(final SearchResult result) {
-		return new DefaultSearchAction("Help", () -> {
+		return new DefaultSearchAction("Help", false, () -> {
 			uiService.showDialog("TODO: help with module: " +
 				((ModuleSearchResult) result).info().getTitle());
-		}, false);
+		});
 	}
 }

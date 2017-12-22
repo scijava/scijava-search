@@ -56,8 +56,7 @@ public class RunModuleSearchActionFactory implements SearchActionFactory {
 
 	@Override
 	public SearchAction create(final SearchResult result) {
-		return new DefaultSearchAction("Run", () -> {
-			moduleService.run(((ModuleSearchResult) result).info(), true);
-		}, true);
+		return new DefaultSearchAction("Run", true, //
+			() -> moduleService.run(((ModuleSearchResult) result).info(), true));
 	}
 }

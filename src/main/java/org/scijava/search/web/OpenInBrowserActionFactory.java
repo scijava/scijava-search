@@ -62,8 +62,8 @@ public class OpenInBrowserActionFactory implements SearchActionFactory {
 
 	@Override
 	public SearchAction create(final SearchResult result) {
-		return new DefaultSearchAction("Open in Browser", //
-			() -> openURL(result), true);
+		return new DefaultSearchAction("Open in Browser", true, //
+			() -> openURL(result));
 	}
 
 	private void openURL(final SearchResult result) {

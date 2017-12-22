@@ -55,9 +55,9 @@ public class SourceModuleSearchActionFactory implements SearchActionFactory {
 
 	@Override
 	public SearchAction create(final SearchResult result) {
-		return new DefaultSearchAction("Source", () -> {
+		return new DefaultSearchAction("Source", true, () -> {
 			uiService.showDialog("TODO: source for module: " +
 				((ModuleSearchResult) result).info().getTitle());
-		}, true);
+		});
 	}
 }

@@ -37,15 +37,15 @@ package org.scijava.search;
 public class DefaultSearchAction implements SearchAction {
 
 	private final String label;
+	private final boolean closesSearch;
 	private final Runnable r;
-	private final boolean closeSearch;
 
-	public DefaultSearchAction(final String label, final Runnable r,
-		final boolean closeSearch)
+	public DefaultSearchAction(final String label, final boolean closesSearch,
+		final Runnable r)
 	{
 		this.label = label;
 		this.r = r;
-		this.closeSearch = closeSearch;
+		this.closesSearch = closesSearch;
 	}
 
 	@Override
@@ -59,7 +59,7 @@ public class DefaultSearchAction implements SearchAction {
 	}
 
 	@Override
-	public boolean willCloseSearch() {
-		return closeSearch;
+	public boolean closesSearch() {
+		return closesSearch;
 	}
 }

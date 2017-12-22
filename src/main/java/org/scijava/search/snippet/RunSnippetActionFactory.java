@@ -66,9 +66,9 @@ public class RunSnippetActionFactory implements SearchActionFactory {
 			repl.initialize(); // TODO: initialize(false) once it exists.
 		}
 
-		return new DefaultSearchAction("Evaluate", () -> {
+		return new DefaultSearchAction("Evaluate", true, () -> {
 			repl.lang(snippetResult.language().getLanguageName());
 			repl.evaluate(snippetResult.snippet());
-		}, true);
+		});
 	}
 }

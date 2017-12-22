@@ -77,11 +77,6 @@ public class SnippetSearchResult implements SearchResult {
 	}
 
 	@Override
-	public String identifier() {
-		return name();
-	}
-
-	@Override
 	public String iconPath() {
 		return "/icons/search/code.png";
 	}

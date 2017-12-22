@@ -44,7 +44,9 @@ public interface SearchResult {
 
 	String name();
 
-	String identifier();
+	default String identifier() {
+		return name();
+	}
 
 	String iconPath();
 

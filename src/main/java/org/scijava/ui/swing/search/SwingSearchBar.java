@@ -831,11 +831,6 @@ public class SwingSearchBar extends JTextField {
 		}
 
 		@Override
-		public String identifier() {
-			return name();
-		}
-
-		@Override
 		public String iconPath() {
 			return null;
 		}

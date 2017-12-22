@@ -89,6 +89,8 @@
 
 		<!-- NB: Deploy releases to the ImageJ Maven repository. -->
 		<releaseProfiles>deploy-to-imagej</releaseProfiles>
+
+		<scijava-common.version>2.68.0</scijava-common.version>
 	</properties>
 
 	<repositories>

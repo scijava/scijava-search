@@ -63,7 +63,7 @@ public class RunSnippetActionFactory implements SearchActionFactory {
 
 		if (repl == null) {
 			repl = new ScriptREPL(scriptService.context());
-			repl.initialize(); // TODO: initialize(false) once it exists.
+			repl.initialize(false);
 		}
 
 		return new DefaultSearchAction("Evaluate", true, () -> {

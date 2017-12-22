@@ -31,6 +31,8 @@ package org.scijava.plugin;
 
 import org.scijava.Typed;
 
+// TODO: Move this interface to scijava-common.
+
 /**
  * Interface for plugins that act as factories, creating objects on demand.
  *

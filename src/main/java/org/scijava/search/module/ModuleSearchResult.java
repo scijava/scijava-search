@@ -58,7 +58,6 @@ public class ModuleSearchResult implements SearchResult {
 		this.baseDir = baseDir;
 
 		props = new LinkedHashMap<>();
-//		props.put("Title", info.getTitle());
 		final MenuPath menuPath = info.getMenuPath();
 		if (menuPath != null) {
 			props.put("Menu path", menuPath.getMenuString(false));

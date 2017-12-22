@@ -307,8 +307,8 @@ public class SwingSearchBar extends JTextField {
 	/** Called when the user hits ENTER. */
 	private void run() {
 		assertDispatchThread();
-		searchPanel.execute();
-		reset();
+		final boolean closeSearch = searchPanel.execute();
+		if (closeSearch) reset();
 	}
 
 	private void reset() {
@@ -610,7 +610,7 @@ public class SwingSearchBar extends JTextField {
 		}
 
 		/** Executes the default search action. */
-		private void execute() {
+		private boolean execute() {
 			assertDispatchThread();
 
 			// Figure out which result to execute.
@@ -619,14 +619,16 @@ public class SwingSearchBar extends JTextField {
 			if (selectedResult == null) {
 				// Nothing is selected; use the first result on the list.
 				final int firstResultIndex = firstResultIndex();
-				if (firstResultIndex < 0) return; // no results available
+				if (firstResultIndex < 0) return false; // no results available
 				result = result(firstResultIndex);
 			}
 			else result = selectedResult;
 
 			final List<SearchAction> actions = searchService.actions(result);
-			if (actions.isEmpty()) return;
-			threadService.run(() -> actions.get(0).run());
+			if (actions.isEmpty()) return false;
+			final SearchAction action = actions.get(0);
+			threadService.run(() -> action.run());
+			return action.closesSearch();
 		}
 
 		private void rebuild() {

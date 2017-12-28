@@ -29,8 +29,6 @@
 
 package org.scijava.search.module;
 
-import java.io.File;
-import java.net.URL;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -39,8 +37,6 @@ import org.scijava.MenuPath;
 import org.scijava.input.Accelerator;
 import org.scijava.module.ModuleInfo;
 import org.scijava.search.SearchResult;
-import org.scijava.util.ClassUtils;
-import org.scijava.util.FileUtils;
 
 /**
  * Search result for the {@link ModuleSearcher}.
@@ -107,12 +103,8 @@ public class ModuleSearchResult implements SearchResult {
 	// -- Helper methods --
 
 	private String getLocation() {
-		final URL location = ClassUtils.getLocation(info.getDelegateClassName());
-		final File file = FileUtils.urlToFile(location);
-		if (file == null) return null;
-		final String path = file.getAbsolutePath();
-		if (path == null) return null;
-		if (path.startsWith(baseDir)) {
+		final String path = info.getLocation();
+		if (path != null && baseDir != null && path.startsWith(baseDir)) {
 			if (path.length() == baseDir.length()) return "";
 			return path.substring(baseDir.length() + 1);
 		}

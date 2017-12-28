@@ -32,13 +32,16 @@ package org.scijava.search;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.regex.PatternSyntaxException;
 
 import org.scijava.Context;
 import org.scijava.log.LogService;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.PluginService;
 import org.scijava.thread.ThreadService;
+import org.scijava.util.DebugUtils;
 
 /**
  * Default implementation of {@link SearchOperation}.
@@ -164,8 +167,46 @@ public class DefaultSearchOperation implements SearchOperation {
 			final boolean supported = searcher.supports(query);
 			final boolean enabled = searchService.enabled(searcher);
 			if (!valid) return;
-			final List<SearchResult> results = supported ? (enabled ? //
-				searcher.search(query, fuzzy) : Collections.emptyList()) : null;
+			List<SearchResult> results;
+			try {
+				if (!supported) results = null;
+				else if (!enabled) results = Collections.emptyList();
+				else results = searcher.search(query, fuzzy);
+			}
+			catch (final Throwable t) {
+				// NB: Be defensive about errors.
+				results = Collections.singletonList(new SearchResult() {
+
+					private final Map<String, String> props = //
+						Collections.singletonMap(null, errorMessage());
+
+					@Override
+					public String name() {
+						return "<error>";
+					}
+
+					@Override
+					public String iconPath() {
+						return null;
+					}
+
+					@Override
+					public Map<String, String> properties() {
+						return props;
+					}
+
+					private String errorMessage() {
+						if (t instanceof PatternSyntaxException) {
+							return pre(t.getMessage());
+						}
+						return pre(DebugUtils.getStackTrace(t));
+					}
+
+					private String pre(final String s) {
+						return "<pre style=\"font-size: 0.9em\">" + s + "</pre>";
+					}
+				});
+			}
 			if (!valid) return;
 			for (final SearchListener l : listeners) {
 				l.searchCompleted(new SearchEvent(searcher, results, exclusive));

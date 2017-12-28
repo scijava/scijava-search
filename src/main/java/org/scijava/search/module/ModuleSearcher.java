@@ -35,6 +35,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.scijava.Context;
+import org.scijava.MenuEntry;
+import org.scijava.MenuPath;
 import org.scijava.Priority;
 import org.scijava.app.AppService;
 import org.scijava.module.ModuleInfo;
@@ -76,23 +78,21 @@ public class ModuleSearcher implements Searcher {
 
 		final LinkedHashSet<ModuleInfo> matches = new LinkedHashSet<>();
 
-		// Get the list of all enabled, visible, valid modules.
+		// Get the list of all modules for consideration.
 		final List<ModuleInfo> modules = moduleService.getModules().stream() //
-			.filter(ModuleInfo::isEnabled) //
-			.filter(ModuleInfo::isVisible) //
-			.filter(ModuleInfo::isValid) //
+			.filter(this::isGoodModule) //
 			.collect(Collectors.toList());
 
 		final String textLower = text.toLowerCase();
 
 		// First, add modules where title starts with the text.
 		modules.stream() //
-			.filter(info -> info.getTitle().startsWith(textLower)) //
+			.filter(info -> ModuleSearcher.title(info).startsWith(textLower)) //
 			.forEach(matches::add);
 
 		// Next, add modules where title has text inside somewhere.
 		modules.stream() //
-			.filter(info -> matches(info.getTitle(), textLower)) //
+			.filter(info -> matches(ModuleSearcher.title(info), textLower)) //
 			.forEach(matches::add);
 
 		// Finally, add modules where menu path has text inside somewhere.
@@ -106,7 +106,38 @@ public class ModuleSearcher implements Searcher {
 			.collect(Collectors.toList());
 	}
 
+	// -- Utility methods --
+
+	/**
+	 * Gets a human-readable title for the module, or null if none.
+	 * <p>
+	 * We do not use {@link ModuleInfo#getTitle()} because that method tries very
+	 * hard to return something in every case, whereas we only want to give really
+	 * nice titles, or null if the module is inappropriate.
+	 * </p>
+	 */
+	public static String title(final ModuleInfo info) {
+		// use object label, if available
+		final String label = info.getLabel();
+		if (label != null && !label.isEmpty()) return label;
+
+		// use name of leaf menu item, if available
+		final MenuPath menuPath = info.getMenuPath();
+		if (menuPath != null && menuPath.size() > 0) {
+			final MenuEntry menuLeaf = menuPath.getLeaf();
+			final String menuName = menuLeaf.getName();
+			if (menuName != null && !menuName.isEmpty()) return menuName;
+		}
+
+		return null;
+	}
+
 	// -- Helper methods --
+
+	private boolean isGoodModule(final ModuleInfo info) {
+		return info.isValid() && info.isVisible() && info.isEnabled() &&
+			title(info) != null;
+	}
 
 	private boolean matches(final String actual, final String desired) {
 		// TODO: Implement fuzzy matching option, and maybe case sensitive option.

@@ -79,14 +79,14 @@ public class ModuleSearchResult implements SearchResult {
 
 	@Override
 	public String name() {
-		return info.getTitle();
+		return ModuleSearcher.title(info);
 	}
 
 	@Override
 	public String identifier() {
 		final String menuPath = info.getMenuPath().getMenuString().replace(">",
 			"\u203a");
-		return menuPath.isEmpty() ? info.getTitle() : menuPath;
+		return menuPath.isEmpty() ? name() : menuPath;
 	}
 
 	@Override

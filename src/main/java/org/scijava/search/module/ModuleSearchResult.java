@@ -55,8 +55,8 @@ public class ModuleSearchResult implements SearchResult {
 
 		props = new LinkedHashMap<>();
 		final MenuPath menuPath = info.getMenuPath();
-		if (menuPath != null) {
-			props.put("Menu path", menuPath.getMenuString(false));
+		if (menuPath != null && !menuPath.isEmpty()) {
+			props.put("Menu path", getMenuPath(false));
 			final MenuEntry menuLeaf = menuPath.getLeaf();
 			if (menuLeaf != null) {
 				final Accelerator accelerator = menuLeaf.getAccelerator();
@@ -80,8 +80,7 @@ public class ModuleSearchResult implements SearchResult {
 
 	@Override
 	public String identifier() {
-		final String menuPath = info.getMenuPath().getMenuString().replace(">",
-			"\u203a");
+		final String menuPath = getMenuPath(true);
 		return menuPath.isEmpty() ? name() : menuPath;
 	}
 
@@ -109,5 +108,11 @@ public class ModuleSearchResult implements SearchResult {
 			return path.substring(baseDir.length() + 1);
 		}
 		return path;
+	}
+
+	private String getMenuPath(boolean includeLeaf) {
+		final MenuPath menuPath = info.getMenuPath();
+		if (menuPath == null) return "";
+		return menuPath.getMenuString(includeLeaf).replace(">", "\u203a");
 	}
 }

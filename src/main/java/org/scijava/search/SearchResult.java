@@ -42,8 +42,10 @@ import java.util.Map;
  */
 public interface SearchResult {
 
+	/** Title of the search result, intended for detailed display. */
 	String name();
 
+	/** Short name, intended for display in the list of results. */
 	default String identifier() {
 		return name();
 	}

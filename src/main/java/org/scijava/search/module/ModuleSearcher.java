@@ -34,7 +34,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.scijava.Context;
 import org.scijava.MenuEntry;
 import org.scijava.MenuPath;
 import org.scijava.Priority;
@@ -53,9 +52,6 @@ import org.scijava.search.Searcher;
  */
 @Plugin(type = Searcher.class, priority = Priority.VERY_HIGH)
 public class ModuleSearcher implements Searcher {
-
-	@Parameter
-	private Context context;
 
 	@Parameter
 	private ModuleService moduleService;

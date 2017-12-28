@@ -88,12 +88,13 @@ public class ModuleSearcher implements Searcher {
 
 		// Next, add modules where title has text inside somewhere.
 		modules.stream() //
-			.filter(info -> matches(title(info), textLower)) //
+			.filter(info -> matches(title(info).toLowerCase(), textLower)) //
 			.forEach(matches::add);
 
 		// Finally, add modules where menu path has text inside somewhere.
 		modules.stream() //
-			.filter(info -> matches(info.getMenuPath().toString(), textLower)) //
+			.filter(info -> matches(info.getMenuPath().toString().toLowerCase(),
+				textLower)) //
 			.forEach(matches::add);
 
 		// Wrap each matching ModuleInfo in a ModuleSearchResult.
@@ -159,6 +160,6 @@ public class ModuleSearcher implements Searcher {
 	private boolean matches(final String actual, final String desired) {
 		// TODO: Implement fuzzy matching option, and maybe case sensitive option.
 		// Probably put it in the SearchService itself, and make an API toggle.
-		return actual.toLowerCase().matches(".*" + desired + ".*");
+		return actual.matches(".*" + desired + ".*");
 	}
 }

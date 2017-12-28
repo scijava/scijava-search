@@ -754,7 +754,7 @@ public class SwingSearchBar extends JTextField {
 			return output;
 		}
 
-		public String escapeHtml(final String s) {
+		private String escapeHtml(final String s) {
 			final StringBuilder out = new StringBuilder(Math.max(16, s.length()));
 			for (int i = 0; i < s.length(); i++) {
 				final char c = s.charAt(i);
@@ -769,7 +769,6 @@ public class SwingSearchBar extends JTextField {
 			}
 			return out.toString();
 		}
-
 	}
 
 	private class SearchBarKeyAdapter extends KeyAdapter {

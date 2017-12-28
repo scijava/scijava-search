@@ -68,8 +68,8 @@ public class OpenInBrowserActionFactory implements SearchActionFactory {
 
 	private void openURL(final SearchResult result) {
 		try {
-			final URL url = new URL(result.properties().get("url"));
-			platformService.open(url);
+			final String url = ((WebSearchResult) result).url();
+			platformService.open(new URL(url));
 		}
 		catch (final IOException exc) {
 			log.error(exc);

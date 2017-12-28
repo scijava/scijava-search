@@ -415,10 +415,10 @@ public class SwingSearchBar extends JTextField {
 					final SearchResult result = resultsList.getSelectedValue();
 					if (result == null || isHeader(result)) {
 						if (result != null) {
-							final Searcher searcher = ((SearchResultHeader) result)
-								.searcher();
-							searchService.setEnabled(searcher, !searchService.enabled(
-								searcher));
+							final Searcher searcher = //
+								((SearchResultHeader) result).searcher();
+							searchService.setEnabled(searcher, //
+								!searchService.enabled(searcher));
 							SwingSearchBar.this.search();
 						}
 					}
@@ -448,82 +448,79 @@ public class SwingSearchBar extends JTextField {
 			resultsList.addListSelectionListener(lse -> {
 				if (lse.getValueIsAdjusting()) return;
 				final SearchResult result = resultsList.getSelectedValue();
-				if (result == null || isHeader(result)) {
-					if (result != null) {
-						threadService.queue(() -> {
-							down();
-						});
-						return;
-					}
+				if (isHeader(result)) {
+					threadService.queue(() -> down());
+					return;
+				}
+				if (result == null) {
 					// clear details pane
 					detailsTitle.setText("");
 					detailsProps.removeAll();
 					detailsButtons.removeAll();
+					return;
 				}
-				else {
-					// populate details pane
-					detailsTitle.setText("<html><h2>" + highlightSearchUnderline(
-						escapeHtml(result.name()), searchText) + "</h2>");
-					detailsProps.removeAll();
-					result.properties().forEach((k, v) -> {
-						if (v != "") {
-							if (k == null) {
-								final JTextPane textPane = new JTextPane();
-								textPane.setContentType("text/html");
-								textPane.setText(highlightSearchBold(v, searchText));
-								final Font font = UIManager.getFont("Label.font");
-								final String bodyRule = "body { font-family: " + font
-									.getFamily() + "; " + "font-size: " + font.getSize() +
-									"pt; }";
-								((HTMLDocument) textPane.getDocument()).getStyleSheet().addRule(
-									bodyRule);
-								textPane.setBorder(BorderFactory.createCompoundBorder(
-									BorderFactory.createMatteBorder(1, 0, 1, 0, Color.DARK_GRAY),
-									BorderFactory.createEmptyBorder(PAD, 0, PAD, 0)));
-								textPane.setEditable(false);
-								textPane.setOpaque(false);
-								detailsProps.add(textPane, "growx, wmax 100%");
-							}
-							else {
-								final JLabel keyLabel = new JLabel("<html>" +
-									"<strong style=\"color: gray;\">" + k +
-									"&nbsp;&nbsp;</strong>");
-								keyLabel.setFont(smaller(keyLabel.getFont(), 1));
-								detailsProps.add(keyLabel, "growx, pad 0 0 10 0");
-								final JTextArea valueField = new JTextArea();
-								valueField.setText(v);
-								valueField.setLineWrap(true);
-								valueField.setWrapStyleWord(true);
-								valueField.setEditable(false);
-								valueField.setBackground(null);
-								valueField.setBorder(null);
-								detailsProps.add(valueField, "growx, wmax 100%");
-							}
-						}
-					});
-					detailsButtons.removeAll();
-					final List<SearchAction> actions = searchService.actions(result);
-					boolean first = true;
-					for (final SearchAction action : actions) {
-						final JButton button = new JButton(action.toString());
-						button.addActionListener(ae -> {
-							action.run();
-							if (action.closesSearch()) {
-								reset();
-							}
-						});
-						button.addKeyListener(new SearchBarKeyAdapter());
-						if (first) {
-							detailsButtons.add(button, "grow, spanx");
-							final JRootPane rootPane = this.getRootPane();
-							if (rootPane != null) {
-								rootPane.setDefaultButton(button);
-							}
-							first = false;
+				// populate details pane
+				detailsTitle.setText("<html><h2>" + highlightSearchUnderline(
+					escapeHtml(result.name()), searchText) + "</h2>");
+				detailsProps.removeAll();
+				result.properties().forEach((k, v) -> {
+					if (v != "") {
+						if (k == null) {
+							final JTextPane textPane = new JTextPane();
+							textPane.setContentType("text/html");
+							textPane.setText(highlightSearchBold(v, searchText));
+							final Font font = UIManager.getFont("Label.font");
+							final String bodyRule = "body { font-family: " + font
+								.getFamily() + "; " + "font-size: " + font.getSize() +
+								"pt; }";
+							((HTMLDocument) textPane.getDocument()).getStyleSheet().addRule(
+								bodyRule);
+							textPane.setBorder(BorderFactory.createCompoundBorder(
+								BorderFactory.createMatteBorder(1, 0, 1, 0, Color.DARK_GRAY),
+								BorderFactory.createEmptyBorder(PAD, 0, PAD, 0)));
+							textPane.setEditable(false);
+							textPane.setOpaque(false);
+							detailsProps.add(textPane, "growx, wmax 100%");
 						}
 						else {
-							detailsButtons.add(button, "growx");
+							final JLabel keyLabel = new JLabel("<html>" +
+								"<strong style=\"color: gray;\">" + k +
+								"&nbsp;&nbsp;</strong>");
+							keyLabel.setFont(smaller(keyLabel.getFont(), 1));
+							detailsProps.add(keyLabel, "growx, pad 0 0 10 0");
+							final JTextArea valueField = new JTextArea();
+							valueField.setText(v);
+							valueField.setLineWrap(true);
+							valueField.setWrapStyleWord(true);
+							valueField.setEditable(false);
+							valueField.setBackground(null);
+							valueField.setBorder(null);
+							detailsProps.add(valueField, "growx, wmax 100%");
 						}
+					}
+				});
+				detailsButtons.removeAll();
+				final List<SearchAction> actions = searchService.actions(result);
+				boolean first = true;
+				for (final SearchAction action : actions) {
+					final JButton button = new JButton(action.toString());
+					button.addActionListener(ae -> {
+						action.run();
+						if (action.closesSearch()) {
+							reset();
+						}
+					});
+					button.addKeyListener(new SearchBarKeyAdapter());
+					if (first) {
+						detailsButtons.add(button, "grow, spanx");
+						final JRootPane rootPane = this.getRootPane();
+						if (rootPane != null) {
+							rootPane.setDefaultButton(button);
+						}
+						first = false;
+					}
+					else {
+						detailsButtons.add(button, "growx");
 					}
 				}
 			});

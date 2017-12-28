@@ -128,6 +128,27 @@ public class ModuleSearcher implements Searcher {
 		return null;
 	}
 
+	/** Gets the icon path associated with the given module. */
+	public static String iconPath(final ModuleInfo info) {
+		final String iconPath = info.getIconPath();
+		if (iconPath != null) return iconPath;
+		final MenuPath menuPath = info.getMenuPath();
+		return menuPath == null || menuPath.getLeaf() == null ? //
+			null : menuPath.getLeaf().getIconPath();
+	}
+
+	/** Gets an abbreviated location for the given module. */
+	public static String location(final ModuleInfo info, final String baseDir) {
+		String path = info.getLocation();
+		if (path == null) return null;
+		if (path.startsWith("file:/")) path = path.replaceFirst("file:/+", "/");
+		if (baseDir != null && path.startsWith(baseDir)) {
+			if (path.length() == baseDir.length()) return "";
+			path = path.substring(baseDir.length() + 1);
+		}
+		return path;
+	}
+
 	// -- Helper methods --
 
 	private boolean isGoodModule(final ModuleInfo info) {

@@ -46,12 +46,10 @@ import org.scijava.search.SearchResult;
 public class ModuleSearchResult implements SearchResult {
 
 	private final ModuleInfo info;
-	private final String baseDir;
 	private final Map<String, String> props;
 
 	public ModuleSearchResult(final ModuleInfo info, final String baseDir) {
 		this.info = info;
-		this.baseDir = baseDir;
 
 		props = new LinkedHashMap<>();
 		final MenuPath menuPath = info.getMenuPath();
@@ -66,7 +64,7 @@ public class ModuleSearchResult implements SearchResult {
 			}
 		}
 		props.put("Identifier", info.getIdentifier());
-		props.put("Location", getLocation());
+		props.put("Location", ModuleSearcher.location(info, baseDir));
 	}
 
 	public ModuleInfo info() {
@@ -86,12 +84,7 @@ public class ModuleSearchResult implements SearchResult {
 
 	@Override
 	public String iconPath() {
-		final String iconPath = info.getIconPath();
-		if (iconPath != null) return iconPath;
-		if (info.getMenuPath() != null && info.getMenuPath().getLeaf() != null) {
-			return info.getMenuPath().getLeaf().getIconPath();
-		}
-		return null;
+		return ModuleSearcher.iconPath(info);
 	}
 
 	@Override
@@ -100,17 +93,6 @@ public class ModuleSearchResult implements SearchResult {
 	}
 
 	// -- Helper methods --
-
-	private String getLocation() {
-		String path = info.getLocation();
-		if (path == null) return null;
-		if (path.startsWith("file:/")) path = path.replaceFirst("file:/+", "/");
-		if (baseDir != null && path.startsWith(baseDir)) {
-			if (path.length() == baseDir.length()) return "";
-			path = path.substring(baseDir.length() + 1);
-		}
-		return path;
-	}
 
 	private String getMenuPath(boolean includeLeaf) {
 		final MenuPath menuPath = info.getMenuPath();

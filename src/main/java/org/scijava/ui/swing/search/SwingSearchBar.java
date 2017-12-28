@@ -466,39 +466,38 @@ public class SwingSearchBar extends JTextField {
 					escapeHtml(result.name()), searchText) + "</h2>");
 				detailsProps.removeAll();
 				result.properties().forEach((k, v) -> {
-					if (v != "") {
-						if (k == null) {
-							final JTextPane textPane = new JTextPane();
-							textPane.setContentType("text/html");
-							textPane.setText(highlightSearchBold(v, searchText));
-							final Font font = UIManager.getFont("Label.font");
-							final String bodyRule = "body { font-family: " + font
-								.getFamily() + "; " + "font-size: " + font.getSize() +
-								"pt; }";
-							((HTMLDocument) textPane.getDocument()).getStyleSheet().addRule(
-								bodyRule);
-							textPane.setBorder(BorderFactory.createCompoundBorder(
-								BorderFactory.createMatteBorder(1, 0, 1, 0, Color.DARK_GRAY),
-								BorderFactory.createEmptyBorder(PAD, 0, PAD, 0)));
-							textPane.setEditable(false);
-							textPane.setOpaque(false);
-							detailsProps.add(textPane, "growx, wmax 100%");
-						}
-						else {
-							final JLabel keyLabel = new JLabel("<html>" +
-								"<strong style=\"color: gray;\">" + k +
-								"&nbsp;&nbsp;</strong>");
-							keyLabel.setFont(smaller(keyLabel.getFont(), 1));
-							detailsProps.add(keyLabel, "growx, pad 0 0 10 0");
-							final JTextArea valueField = new JTextArea();
-							valueField.setText(v);
-							valueField.setLineWrap(true);
-							valueField.setWrapStyleWord(true);
-							valueField.setEditable(false);
-							valueField.setBackground(null);
-							valueField.setBorder(null);
-							detailsProps.add(valueField, "growx, wmax 100%");
-						}
+					if (v == "") return;
+					if (k == null) {
+						final JTextPane textPane = new JTextPane();
+						textPane.setContentType("text/html");
+						textPane.setText(highlightSearchBold(v, searchText));
+						final Font font = UIManager.getFont("Label.font");
+						final String bodyRule = "body { font-family: " + //
+							font.getFamily() + "; " + "font-size: " + font.getSize() +
+							"pt; }";
+						((HTMLDocument) textPane.getDocument()).getStyleSheet().addRule(
+							bodyRule);
+						textPane.setBorder(BorderFactory.createCompoundBorder(
+							BorderFactory.createMatteBorder(1, 0, 1, 0, Color.DARK_GRAY),
+							BorderFactory.createEmptyBorder(PAD, 0, PAD, 0)));
+						textPane.setEditable(false);
+						textPane.setOpaque(false);
+						detailsProps.add(textPane, "growx, wmax 100%");
+					}
+					else {
+						final JLabel keyLabel = new JLabel("<html>" +
+							"<strong style=\"color: gray;\">" + k +
+							"&nbsp;&nbsp;</strong>");
+						keyLabel.setFont(smaller(keyLabel.getFont(), 1));
+						detailsProps.add(keyLabel, "growx, pad 0 0 10 0");
+						final JTextArea valueField = new JTextArea();
+						valueField.setText(v);
+						valueField.setLineWrap(true);
+						valueField.setWrapStyleWord(true);
+						valueField.setEditable(false);
+						valueField.setBackground(null);
+						valueField.setBorder(null);
+						detailsProps.add(valueField, "growx, wmax 100%");
 					}
 				});
 				detailsButtons.removeAll();

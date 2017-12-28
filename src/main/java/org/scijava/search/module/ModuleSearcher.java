@@ -83,18 +83,17 @@ public class ModuleSearcher implements Searcher {
 
 		// First, add modules where title starts with the text.
 		modules.stream() //
-			.filter(info -> title(info).toLowerCase().startsWith(textLower)) //
+			.filter(info -> startsWith(info, textLower) ) //
 			.forEach(matches::add);
 
 		// Next, add modules where title has text inside somewhere.
 		modules.stream() //
-			.filter(info -> matches(title(info).toLowerCase(), textLower)) //
+			.filter(info -> hasSubstring(info, textLower)) //
 			.forEach(matches::add);
 
 		// Finally, add modules where menu path has text inside somewhere.
 		modules.stream() //
-			.filter(info -> matches(info.getMenuPath().toString().toLowerCase(),
-				textLower)) //
+			.filter(info -> hasSubstring(info, textLower)) //
 			.forEach(matches::add);
 
 		// Wrap each matching ModuleInfo in a ModuleSearchResult.
@@ -157,9 +156,16 @@ public class ModuleSearcher implements Searcher {
 			title(info) != null;
 	}
 
-	private boolean matches(final String actual, final String desired) {
-		// TODO: Implement fuzzy matching option, and maybe case sensitive option.
-		// Probably put it in the SearchService itself, and make an API toggle.
-		return actual.matches(".*" + desired + ".*");
+	private boolean startsWith(final ModuleInfo info, final String desiredLower) {
+		final String title = title(info);
+		return title != null && title.toLowerCase().startsWith(desiredLower);
+	}
+
+	private boolean hasSubstring(final ModuleInfo info,
+		final String desiredLower)
+	{
+		final String title = title(info);
+		return title != null && //
+			title.toLowerCase().matches(".*" + desiredLower + ".*");
 	}
 }

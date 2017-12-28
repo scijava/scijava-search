@@ -457,6 +457,8 @@ public class SwingSearchBar extends JTextField {
 					detailsTitle.setText("");
 					detailsProps.removeAll();
 					detailsButtons.removeAll();
+					detailsPane.validate();
+					detailsPane.repaint();
 					return;
 				}
 				// populate details pane
@@ -523,6 +525,8 @@ public class SwingSearchBar extends JTextField {
 						detailsButtons.add(button, "growx");
 					}
 				}
+				detailsPane.validate();
+				detailsPane.repaint();
 			});
 
 			detailsPane.add(buttons, "pos n 0 100% n");

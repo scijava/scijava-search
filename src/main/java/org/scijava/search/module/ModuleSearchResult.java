@@ -102,10 +102,12 @@ public class ModuleSearchResult implements SearchResult {
 	// -- Helper methods --
 
 	private String getLocation() {
-		final String path = info.getLocation();
-		if (path != null && baseDir != null && path.startsWith(baseDir)) {
+		String path = info.getLocation();
+		if (path == null) return null;
+		if (path.startsWith("file:/")) path = path.replaceFirst("file:/+", "/");
+		if (baseDir != null && path.startsWith(baseDir)) {
 			if (path.length() == baseDir.length()) return "";
-			return path.substring(baseDir.length() + 1);
+			path = path.substring(baseDir.length() + 1);
 		}
 		return path;
 	}

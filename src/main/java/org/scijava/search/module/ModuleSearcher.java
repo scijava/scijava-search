@@ -83,12 +83,12 @@ public class ModuleSearcher implements Searcher {
 
 		// First, add modules where title starts with the text.
 		modules.stream() //
-			.filter(info -> ModuleSearcher.title(info).startsWith(textLower)) //
+			.filter(info -> title(info).toLowerCase().startsWith(textLower)) //
 			.forEach(matches::add);
 
 		// Next, add modules where title has text inside somewhere.
 		modules.stream() //
-			.filter(info -> matches(ModuleSearcher.title(info), textLower)) //
+			.filter(info -> matches(title(info), textLower)) //
 			.forEach(matches::add);
 
 		// Finally, add modules where menu path has text inside somewhere.

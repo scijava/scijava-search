@@ -152,8 +152,7 @@ public class ModuleSearcher implements Searcher {
 	// -- Helper methods --
 
 	private boolean isGoodModule(final ModuleInfo info) {
-		return info.isValid() && info.isVisible() && info.isEnabled() &&
-			title(info) != null;
+		return info.isVisible() && info.isEnabled() && title(info) != null;
 	}
 
 	private boolean startsWith(final ModuleInfo info, final String desiredLower) {

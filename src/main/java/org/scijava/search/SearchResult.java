@@ -50,6 +50,10 @@ public interface SearchResult {
 		return name();
 	}
 
+	default String context() {
+		return "";
+	}
+
 	String iconPath();
 
 	Map<String, String> properties();

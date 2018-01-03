@@ -103,7 +103,8 @@ public class SwingSearchBar extends JTextField {
 	private static final String DEFAULT_MESSAGE = "Click here to search";
 	private static final Color ACTIVE_FONT_COLOR = new Color(0, 0, 0);
 	private static final Color INACTIVE_FONT_COLOR = new Color(150, 150, 150);
-	private static final Color SELECTED_RESULT_COLOR = new Color(70, 152, 251);
+	private static final Color SELECTED_RESULT_COLOR = new Color(186, 218, 255);
+	private static final String CONTEXT_COLOR = "#8C745E";
 	private static final int ICON_SIZE = 16;
 	private static final int PAD = 5;
 
@@ -348,8 +349,14 @@ public class SwingSearchBar extends JTextField {
 
 					final Container parent = getParent();
 
+					String resultSizeStr = "";
+					final int resCount = ((SearchResultHeader) value).resultCount();
+					if(resCount > resultLimit) {
+						resultSizeStr += " <span style='color: " + CONTEXT_COLOR + ";'>(" + resultLimit + "/" + resCount + ")";
+					}
+
 					final JCheckBox headerBox = //
-						new JCheckBox(searcher.title(), searchService.enabled(searcher));
+						new JCheckBox("<html>" + searcher.title() + resultSizeStr, searchService.enabled(searcher));
 					headerBox.setFont(smaller(headerBox.getFont(), 2));
 					if (parent != null) headerBox.setBackground(parent.getBackground());
 					headerCheckboxes.put(searcher.getClass(), headerBox);
@@ -373,9 +380,10 @@ public class SwingSearchBar extends JTextField {
 				item.setBorder(new EmptyBorder(1, PAD, 0, PAD));
 				item.add(icon(value.iconPath()));
 				item.add(Box.createHorizontalStrut(3));
-				final JTextArea name = new JTextArea();
-				name.setText(value.identifier());
-				name.setEditable(false);
+				final JLabel name = new JLabel();
+				Font f = name.getFont();
+				name.setFont(f.deriveFont(f.getStyle() & ~Font.BOLD));
+				name.setText("<html>" + value.identifier() + "&nbsp;&nbsp;<span style='color: " + CONTEXT_COLOR + ";'>" + value.context() + "</span>");
 				name.setBackground(null);
 				item.add(name);
 				item.setBackground(isSelected ? SELECTED_RESULT_COLOR : list.getBackground());
@@ -642,8 +650,10 @@ public class SwingSearchBar extends JTextField {
 
 				if (completeResults == null) continue;
 
+				int resultCount = completeResults.size();
+
 				// Add section header.
-				listModel.addElement(new SearchResultHeader(searcher));
+				listModel.addElement(new SearchResultHeader(searcher, resultCount));
 
 				if (completeResults.isEmpty()) continue;
 
@@ -809,9 +819,15 @@ public class SwingSearchBar extends JTextField {
 	private class SearchResultHeader implements SearchResult {
 
 		private final Searcher searcher;
+		private final int resultCount;
 
-		public SearchResultHeader(final Searcher searcher) {
+		public SearchResultHeader(final Searcher searcher, int resultCount) {
 			this.searcher = searcher;
+			this.resultCount = resultCount;
+		}
+
+		public int resultCount() {
+			return resultCount;
 		}
 
 		public Searcher searcher() {

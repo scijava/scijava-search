@@ -92,16 +92,12 @@ public class ImageJForumSearcher implements Searcher {
 				final String forumPostUrl = "http://forum.imagej.net/t/" + metaInfo.get(
 					"slug") + "/" + metaInfo.get("id") + "/";
 
-				final String details = "Tags: " + metaInfo.get("tags") + "<br />" +
-					"Created: " + metaInfo.get("created_at") + "<br />" +
-					"Last posted: " + metaInfo.get("last_posted_at");
-
 				final Map<String, String> extraProps = new LinkedHashMap<>();
 				extraProps.put("Tags", metaInfo.get("tags"));
 				extraProps.put("Created", formatDate(metaInfo.get("created_at")));
 				extraProps.put("Last posted", formatDate(metaInfo.get("last_posted_at")));
 				searchResults.add(new WebSearchResult(metaInfo.get("title"), //
-					forumPostUrl, details, null, extraProps));
+					forumPostUrl, "", null, extraProps));
 			}
 		}
 		catch (final IOException e) {

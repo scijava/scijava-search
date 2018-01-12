@@ -83,7 +83,7 @@ public class ModuleSearchResult implements SearchResult {
 
 	@Override
 	public String context() {
-		return "/" + getMenuPath(name() != info.getMenuPath().getLeaf().toString(), "/");
+		return "/" + getMenuPath(name() != "" + info.getMenuPath().getLeaf(), "/");
 	}
 
 	@Override

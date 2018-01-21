@@ -41,7 +41,12 @@ package org.scijava.search;
  */
 public interface SearchAction extends Runnable {
 
+	/**
+	 * @deprecated Feature removed. By community demand, nothing forces the search
+	 *             results to close.
+	 */
+	@Deprecated
 	default boolean closesSearch() {
-		return true;
+		return false;
 	}
 }

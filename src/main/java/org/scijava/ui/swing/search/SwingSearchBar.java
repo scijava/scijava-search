@@ -296,8 +296,7 @@ public class SwingSearchBar extends JTextField {
 	/** Called when the user hits ENTER. */
 	private void run() {
 		assertDispatchThread();
-		final boolean closeSearch = searchPanel.execute();
-		if (closeSearch) reset();
+		searchPanel.execute();
 	}
 
 	private void reset() {
@@ -513,12 +512,7 @@ public class SwingSearchBar extends JTextField {
 				boolean first = true;
 				for (final SearchAction action : actions) {
 					final JButton button = new JButton(action.toString());
-					button.addActionListener(ae -> {
-						action.run();
-						if (action.closesSearch()) {
-							reset();
-						}
-					});
+					button.addActionListener(ae -> action.run());
 					button.addKeyListener(new SearchBarKeyAdapter());
 					if (first) {
 						detailsButtons.add(button, "grow, spanx");
@@ -610,7 +604,7 @@ public class SwingSearchBar extends JTextField {
 		}
 
 		/** Executes the default search action. */
-		private boolean execute() {
+		private void execute() {
 			assertDispatchThread();
 
 			// Figure out which result to execute.
@@ -619,16 +613,15 @@ public class SwingSearchBar extends JTextField {
 			if (selectedResult == null) {
 				// Nothing is selected; use the first result on the list.
 				final int firstResultIndex = firstResultIndex();
-				if (firstResultIndex < 0) return false; // no results available
+				if (firstResultIndex < 0) return; // no results available
 				result = result(firstResultIndex);
 			}
 			else result = selectedResult;
 
 			final List<SearchAction> actions = searchService.actions(result);
-			if (actions.isEmpty()) return false;
+			if (actions.isEmpty()) return;
 			final SearchAction action = actions.get(0);
 			threadService.run(() -> action.run());
-			return action.closesSearch();
 		}
 
 		private void rebuild() {

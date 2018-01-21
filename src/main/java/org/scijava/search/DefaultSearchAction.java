@@ -37,15 +37,11 @@ package org.scijava.search;
 public class DefaultSearchAction implements SearchAction {
 
 	private final String label;
-	private final boolean closesSearch;
 	private final Runnable r;
 
-	public DefaultSearchAction(final String label, final boolean closesSearch,
-		final Runnable r)
-	{
+	public DefaultSearchAction(final String label, final Runnable r) {
 		this.label = label;
 		this.r = r;
-		this.closesSearch = closesSearch;
 	}
 
 	@Override
@@ -58,8 +54,15 @@ public class DefaultSearchAction implements SearchAction {
 		r.run();
 	}
 
-	@Override
-	public boolean closesSearch() {
-		return closesSearch;
+	/**
+	 * @deprecated Search actions may no longer demand that the search results be
+	 *             closed. Use {@link #DefaultSearchAction(String, Runnable)}
+	 *             instead.
+	 */
+	@Deprecated
+	public DefaultSearchAction(final String label,
+		@SuppressWarnings("unused") final boolean closesSearch, final Runnable r)
+	{
+		this(label, r);
 	}
 }

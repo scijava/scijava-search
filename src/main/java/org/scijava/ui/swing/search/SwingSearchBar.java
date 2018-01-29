@@ -426,6 +426,10 @@ public class SwingSearchBar extends JTextField {
 						searchService.setEnabled(s, !searchService.enabled(s));
 						SwingSearchBar.this.search();
 					}
+					else if (result != null && e.getClickCount() > 1) {
+						// Trigger default action in response to double click.
+						runDefaultAction();
+					}
 				}
 			});
 

@@ -138,7 +138,7 @@ public class SwingSearchBar extends JTextField {
 		setBorder(BorderFactory.createCompoundBorder(BorderFactory
 			.createEmptyBorder(), BorderFactory.createEmptyBorder(5, 5, 5, 5)));
 
-		addActionListener(e -> run());
+		addActionListener(e -> searchPanel.runDefaultAction());
 		addKeyListener(new SearchBarKeyAdapter());
 		documentListener = new DocumentListener() {
 
@@ -291,12 +291,6 @@ public class SwingSearchBar extends JTextField {
 			showPanel(searchPanel);
 		}
 		searchPanel.search(getText());
-	}
-
-	/** Called when the user hits ENTER. */
-	private void run() {
-		assertDispatchThread();
-		searchPanel.execute();
 	}
 
 	private void reset() {
@@ -600,8 +594,8 @@ public class SwingSearchBar extends JTextField {
 				decrement);
 		}
 
-		/** Executes the default search action. */
-		private void execute() {
+		/** Executes the default search action (e.g. ENTER or double click). */
+		private void runDefaultAction() {
 			assertDispatchThread();
 
 			// Figure out which result to execute.
@@ -789,7 +783,7 @@ public class SwingSearchBar extends JTextField {
 					e.consume();
 					break;
 				case KeyEvent.VK_ENTER:
-					if (searchPanel != null) run();
+					if (searchPanel != null) searchPanel.runDefaultAction();
 					e.consume();
 					break;
 				case KeyEvent.VK_ESCAPE:

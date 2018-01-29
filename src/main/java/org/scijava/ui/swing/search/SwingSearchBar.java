@@ -420,14 +420,11 @@ public class SwingSearchBar extends JTextField {
 				@Override
 				public void mouseClicked(final MouseEvent e) {
 					final SearchResult result = resultsList.getSelectedValue();
-					if (result == null || isHeader(result)) {
-						if (result != null) {
-							final Searcher searcher = //
-								((SearchResultHeader) result).searcher();
-							searchService.setEnabled(searcher, //
-								!searchService.enabled(searcher));
-							SwingSearchBar.this.search();
-						}
+					if (isHeader(result)) {
+						// Enable/disable the searcher corresponding to this header.
+						final Searcher s = ((SearchResultHeader) result).searcher();
+						searchService.setEnabled(s, !searchService.enabled(s));
+						SwingSearchBar.this.search();
 					}
 				}
 			});

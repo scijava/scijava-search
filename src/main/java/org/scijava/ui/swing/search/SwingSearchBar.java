@@ -274,6 +274,24 @@ public class SwingSearchBar extends JTextField {
 		threadService.run(() -> action.run());
 	}
 
+	/** Called on the EDT to terminate the search session. */
+	protected void reset() {
+		assertDispatchThread();
+		if (searchPanel == null) {
+			loseFocus();
+			getDocument().removeDocumentListener(documentListener);
+			setText(DEFAULT_MESSAGE);
+			setForeground(INACTIVE_FONT_COLOR);
+			getDocument().addDocumentListener(documentListener);
+		}
+		else {
+			hidePanel(searchPanel);
+			searchPanel = null;
+			setText("");
+			requestFocusInWindow();
+		}
+	}
+
 	// -- Helper methods --
 
 	/** Defensive programming check to avoid bugs. */
@@ -299,23 +317,6 @@ public class SwingSearchBar extends JTextField {
 			showPanel(searchPanel);
 		}
 		searchPanel.search(getText());
-	}
-
-	private void reset() {
-		assertDispatchThread();
-		if (searchPanel == null) {
-			loseFocus();
-			getDocument().removeDocumentListener(documentListener);
-			setText(DEFAULT_MESSAGE);
-			setForeground(INACTIVE_FONT_COLOR);
-			getDocument().addDocumentListener(documentListener);
-		}
-		else {
-			hidePanel(searchPanel);
-			searchPanel = null;
-			setText("");
-			requestFocusInWindow();
-		}
 	}
 
 	// -- Helper classes --

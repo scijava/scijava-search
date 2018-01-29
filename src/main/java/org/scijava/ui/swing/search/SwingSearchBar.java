@@ -267,7 +267,9 @@ public class SwingSearchBar extends JTextField {
 	}
 
 	/** Called on the EDT to run an action. */
-	protected void runAction(final SearchAction action) {
+	protected void runAction(final SearchAction action,
+		@SuppressWarnings("unused") final boolean isDefault)
+	{
 		assertDispatchThread();
 		threadService.run(() -> action.run());
 	}
@@ -513,7 +515,8 @@ public class SwingSearchBar extends JTextField {
 				boolean first = true;
 				for (final SearchAction action : actions) {
 					final JButton button = new JButton(action.toString());
-					button.addActionListener(ae -> runAction(action));
+					final boolean isDefault = first;
+					button.addActionListener(ae -> runAction(action, isDefault));
 					button.addKeyListener(new SearchBarKeyAdapter());
 					if (first) {
 						detailsButtons.add(button, "grow, spanx");
@@ -621,7 +624,7 @@ public class SwingSearchBar extends JTextField {
 
 			final List<SearchAction> actions = searchService.actions(result);
 			if (actions.isEmpty()) return;
-			runAction(actions.get(0));
+			runAction(actions.get(0), true);
 		}
 
 		private void rebuild() {

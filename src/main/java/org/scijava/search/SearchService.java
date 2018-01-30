@@ -65,8 +65,10 @@ public interface SearchService extends SingletonService<SearchActionFactory>,
 	 * @return A list of actions which could possibly be executed for the result.
 	 */
 	default List<SearchAction> actions(final SearchResult result) {
-		return getInstances().stream().filter(factory -> factory.supports(result))
-			.map(factory -> factory.create(result)).collect(Collectors.toList());
+		return getInstances().stream() //
+			.filter(factory -> factory.supports(result)) //
+			.map(factory -> factory.create(result)) //
+			.collect(Collectors.toList());
 	}
 
 	/** Gets whether the given searcher plugin is currently enabled. */

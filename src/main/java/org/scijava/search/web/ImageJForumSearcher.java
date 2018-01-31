@@ -38,12 +38,14 @@ import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
+import org.ocpsoft.prettytime.PrettyTime;
 import org.scijava.log.LogService;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
@@ -95,7 +97,7 @@ public class ImageJForumSearcher implements Searcher {
 				final Map<String, String> extraProps = new LinkedHashMap<>();
 				extraProps.put("Tags", metaInfo.get("tags"));
 				extraProps.put("Created", formatDate(metaInfo.get("created_at")));
-				extraProps.put("Last posted", formatDate(metaInfo.get("last_posted_at")));
+				extraProps.put("Latest post", formatDate(metaInfo.get("last_posted_at")));
 				searchResults.add(new WebSearchResult(metaInfo.get("title"), //
 					forumPostUrl, "", null, extraProps));
 			}
@@ -160,8 +162,6 @@ public class ImageJForumSearcher implements Searcher {
 
 	private String formatDate(final String datestr) {
 		final Instant instant = Instant.parse(datestr);
-		final LocalDateTime result = LocalDateTime.ofInstant(instant, ZoneId.of(
-			ZoneOffset.UTC.getId()));
-		return result.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+		return new PrettyTime().format(Date.from(instant));
 	}
 }

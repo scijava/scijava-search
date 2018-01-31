@@ -111,5 +111,10 @@
 			<artifactId>miglayout</artifactId>
 			<classifier>swing</classifier>
 		</dependency>
+		<dependency>
+			<groupId>org.ocpsoft.prettytime</groupId>
+			<artifactId>prettytime</artifactId>
+			<version>4.0.1.Final</version>
+		</dependency>
 	</dependencies>
 </project>

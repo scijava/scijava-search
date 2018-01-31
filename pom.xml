@@ -89,6 +89,8 @@
 
 		<!-- NB: Deploy releases to the ImageJ Maven repository. -->
 		<releaseProfiles>deploy-to-imagej</releaseProfiles>
+
+		<prettytime.version>4.0.1.Final</prettytime.version>
 	</properties>
 
 	<repositories>
@@ -114,7 +116,7 @@
 		<dependency>
 			<groupId>org.ocpsoft.prettytime</groupId>
 			<artifactId>prettytime</artifactId>
-			<version>4.0.1.Final</version>
+			<version>${prettytime.version}</version>
 		</dependency>
 	</dependencies>
 </project>

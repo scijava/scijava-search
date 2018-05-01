@@ -34,6 +34,7 @@ import java.util.Map;
 
 import org.scijava.MenuEntry;
 import org.scijava.MenuPath;
+import org.scijava.UIDetails;
 import org.scijava.input.Accelerator;
 import org.scijava.module.ModuleInfo;
 import org.scijava.search.SearchResult;
@@ -103,8 +104,13 @@ public class ModuleSearchResult implements SearchResult {
 	}
 
 	private String getMenuPath(boolean includeLeaf, String separator) {
+		final String menuRoot = info.getMenuRoot();
+		final boolean isContextMenu = menuRoot != null && //
+			!menuRoot.equals(UIDetails.APPLICATION_MENU_ROOT);
+		final String prefix = isContextMenu ? "[" + menuRoot + "]" : "";
 		final MenuPath menuPath = info.getMenuPath();
-		if (menuPath == null) return "";
-		return menuPath.getMenuString(includeLeaf).replace(" > ", separator);
+		if (menuPath == null) return prefix;
+		final String menuString = menuPath.getMenuString(includeLeaf);
+		return prefix + " " + menuString.replace(" > ", separator);
 	}
 }

@@ -746,8 +746,10 @@ public class SwingSearchBar extends JTextField {
 			String output = text;
 			for (final String term : terms) {
 				final List<Integer> res = new ArrayList<>();
-				for (int index = output.toLowerCase().indexOf(term); index >= 0; index =
-					output.toLowerCase().indexOf(term, index + 1))
+				final String s = output.toLowerCase();
+				for (int index = s.indexOf(term); //
+						index >= 0 && index < s.length(); //
+						index = s.indexOf(term, index + 1)) //
 				{
 					res.add(index);
 				}

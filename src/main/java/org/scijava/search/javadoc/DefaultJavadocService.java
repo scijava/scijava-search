@@ -72,39 +72,37 @@ public class DefaultJavadocService extends AbstractService implements
 	@Parameter
 	private LogService log;
 
-	/** Mapping from Java package to Javadoc URL. */
-	private Map<String, String> packageURLs;
+	/** Mapping from Java class name to Javadoc URL. */
+	private Map<String, String> classURLs;
 
 	// -- JavadocService methods --
 
 	@Override
 	public String url(final String className) {
-		final int dot = className.lastIndexOf(".");
-		final String pkg = dot < 0 ? "" : className.substring(0, dot);
-		final String name = dot < 0 ? className : className.substring(dot + 1);
-		final String prefix = packageURLs().get(pkg);
-		return prefix == null ? null : prefix + "/" + name + ".html";
+		return classURLs().get(className);
 	}
 
 	// -- Helper methods --
 
-	private Map<String, String> packageURLs() {
-		if (packageURLs == null) initPackageURLs();
-		return packageURLs;
+	private Map<String, String> classURLs() {
+		if (classURLs == null) initClassURLs();
+		return classURLs;
 	}
 
-	private synchronized void initPackageURLs() {
-		if (packageURLs != null) return;
-		packageURLs = discoverJavadoc();
+	private synchronized void initClassURLs() {
+		if (classURLs != null) return;
+		classURLs = discoverJavadoc();
 	}
 
 	private Map<String, String> discoverJavadoc() {
-		final Map<String, String> packages = new HashMap<>();
+		final Map<String, String> classLinks = new HashMap<>();
 		final String prefix = "https://javadoc.scijava.org/";
 		final Pattern iPattern = Pattern.compile(
 			".*<a href=\"([A-Za-z0-9_-]+)/\">.*");
-		final Pattern pPattern = Pattern.compile(
-			".*<a href=\"([^\"]+)/package-summary.html\">([^<]+)</a>.*");
+		final Pattern pPattern = Pattern.compile(".*<[Aa]" +
+			" [Hh][Rr][Ee][Ff]=\"([^\"]+)\"" +
+			" [Tt][Ii][Tt][Ll][Ee]=\"[^\"]* ([^\"]*)\"" +
+			">(<[^>]+>)*([^<>]+)(<[^>]+>)*</[Aa]>.*");
 		final Map<String, Future<List<String>>> futures = new LinkedHashMap<>();
 
 		// Scan index page for project links.
@@ -112,14 +110,14 @@ public class DefaultJavadocService extends AbstractService implements
 		for (final String line : lines(prefix + "index.html")) {
 			final Matcher iMatcher = iPattern.matcher(line);
 			if (!iMatcher.matches()) continue;
-			// Found a project; download its overview-summary.html asynchronously.
+			// Found a project; download its allclasses-noframe.html asynchronously.
 			final String project = iMatcher.replaceAll("$1");
 			if (project.equals("Java6") || project.equals("Java7")) continue;
 			futures.put(project, //
-				threadService.run(() -> lines(prefix + project + "/overview-summary.html")));
+				threadService.run(() -> lines(prefix + project + "/allclasses-noframe.html")));
 		}
 
-		// Process the downloaded overview-summary pages.
+		// Process the downloaded allclasses-noframe pages.
 		int i = 0;
 		final int max = futures.size() + 1;
 		statusService.showProgress(++i, max);
@@ -129,10 +127,12 @@ public class DefaultJavadocService extends AbstractService implements
 				for (final String line : futures.get(project).get()) {
 					final Matcher pMatcher = pPattern.matcher(line);
 					if (!pMatcher.matches()) continue;
-					// Found a package link; add it to the map.
+					// Found a class link; add it to the map.
 					final String link = pMatcher.group(1);
 					final String pkg = pMatcher.group(2);
-					packages.putIfAbsent(pkg, prefix + project + "/?" + link);
+					final String clazz = pMatcher.group(4).replace('.', '$');
+					final String fqcn = "&lt;Unnamed&gt;".equals(pkg) ? clazz : pkg + "." + clazz;
+					classLinks.putIfAbsent(fqcn, prefix + project + "/?" + link);
 				}
 			}
 			catch (final InterruptedException | ExecutionException exc) {
@@ -142,8 +142,8 @@ public class DefaultJavadocService extends AbstractService implements
 			}
 		}
 		statusService.clearStatus();
-		log.debug("Discovered " + packages.size() + " javadoc packages");
-		return packages;
+		log.debug("Discovered " + classLinks.size() + " javadoc class links");
+		return classLinks;
 	}
 
 	/** Reads URL content as a list of lines with UTF-8 encoding. */

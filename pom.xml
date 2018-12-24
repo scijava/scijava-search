@@ -10,7 +10,7 @@
 	</parent>
 
 	<artifactId>scijava-search</artifactId>
-	<version>0.6.0-SNAPSHOT</version>
+	<version>0.6.0</version>
 
 	<name>SciJava Search</name>
 	<description>Search framework for SciJava applications.</description>
@@ -70,7 +70,7 @@
 	<scm>
 		<connection>scm:git:git://github.com/scijava/scijava-search</connection>
 		<developerConnection>scm:git:git@github.com:scijava/scijava-search</developerConnection>
-		<tag>HEAD</tag>
+		<tag>scijava-search-0.6.0</tag>
 		<url>https://github.com/scijava/scijava-search</url>
 	</scm>
 	<issueManagement>

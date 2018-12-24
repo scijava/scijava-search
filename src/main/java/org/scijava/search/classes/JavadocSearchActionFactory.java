@@ -32,6 +32,7 @@ package org.scijava.search.classes;
 import java.io.IOException;
 import java.net.URL;
 
+import org.scijava.Priority;
 import org.scijava.log.LogService;
 import org.scijava.platform.PlatformService;
 import org.scijava.plugin.Parameter;
@@ -49,7 +50,7 @@ import org.scijava.ui.UIService;
  *
  * @author Curtis Rueden
  */
-@Plugin(type = SearchActionFactory.class)
+@Plugin(type = SearchActionFactory.class, priority = Priority.LOW)
 public class JavadocSearchActionFactory implements SearchActionFactory {
 
 	@Parameter

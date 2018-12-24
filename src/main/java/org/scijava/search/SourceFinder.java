@@ -57,7 +57,7 @@ public final class SourceFinder {
 	 * @param c The class for which a source URL is desired.
 	 * @param log The logger to use for any debug messages.
 	 * @return URL of the class's source.
-	 * @throw SourceNotFoundException If the source location cannot be found.
+	 * @throws SourceNotFoundException If the source location cannot be found.
 	 */
 	public static URL sourceLocation(final Class<?> c, final Logger log)
 		throws SourceNotFoundException

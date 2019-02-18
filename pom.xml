@@ -31,7 +31,7 @@
 		<developer>
 			<id>ctrueden</id>
 			<name>Curtis Rueden</name>
-			<url>http://imagej.net/User:Rueden</url>
+			<url>https://imagej.net/User:Rueden</url>
 			<roles>
 				<role>founder</role>
 				<role>lead</role>
@@ -46,12 +46,12 @@
 	<contributors>
 		<contributor>
 			<name>Deborah Schmidt</name>
-			<url>http://imagej.net/User:Frauzfall</url>
+			<url>https://imagej.net/User:Frauzfall</url>
 			<properties><id>frauzufall</id></properties>
 		</contributor>
 		<contributor>
 			<name>Robert Haase</name>
-			<url>http://imagej.net/User:Haase</url>
+			<url>https://imagej.net/User:Haase</url>
 			<properties><id>haesleinhuepf</id></properties>
 			<roles><role>founder</role></roles>
 		</contributor>
@@ -96,7 +96,7 @@
 	<repositories>
 		<repository>
 			<id>imagej.public</id>
-			<url>http://maven.imagej.net/content/groups/public</url>
+			<url>https://maven.imagej.net/content/groups/public</url>
 		</repository>
 	</repositories>
 

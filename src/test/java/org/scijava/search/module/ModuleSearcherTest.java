@@ -15,6 +15,7 @@ import org.scijava.search.Searcher;
 
 import java.util.List;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -75,6 +76,23 @@ public class ModuleSearcherTest {
 		assertNotNull(results);
 		assertTrue(results.size()>=1);
 		assertTrue(containsModule(results, "nolabel"));
+	}
+
+	@Test
+	public void testMatchingPartsInMenu() {
+		createTestModule("nolabel", "Do>something>silly");
+		List<SearchResult> results = moduleSearcher.search("Do silly", true);
+		assertNotNull(results);
+		assertTrue(results.size()>=1);
+		assertTrue(containsModule(results, "nolabel"));
+	}
+
+	@Test
+	public void testNonMatchingPartsInMenu() {
+		createTestModule("nolabel", "Do>something>silly");
+		List<SearchResult> results = moduleSearcher.search("Do nothing", true);
+		assertNotNull(results);
+		assertFalse(containsModule(results, "nolabel"));
 	}
 
 	private boolean containsModule(List<SearchResult> results, String moduleName) {

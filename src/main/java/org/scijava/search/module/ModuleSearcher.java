@@ -88,12 +88,12 @@ public class ModuleSearcher implements Searcher {
 
 		// Next, add modules where title has text inside somewhere.
 		modules.stream() //
-			.filter(info -> hasSubstring(info, textLower)) //
+			.filter(info -> hasSubstringInTitle(info, textLower)) //
 			.forEach(matches::add);
 
 		// Finally, add modules where menu path has text inside somewhere.
 		modules.stream() //
-			.filter(info -> hasSubstring(info, textLower)) //
+			.filter(info -> hasSubstringInMenu(info, textLower)) //
 			.forEach(matches::add);
 
 		// Wrap each matching ModuleInfo in a ModuleSearchResult.
@@ -160,11 +160,19 @@ public class ModuleSearcher implements Searcher {
 		return title != null && title.toLowerCase().startsWith(desiredLower);
 	}
 
-	private boolean hasSubstring(final ModuleInfo info,
-		final String desiredLower)
+	private boolean hasSubstringInTitle(final ModuleInfo info,
+	                                    final String desiredLower)
 	{
 		final String title = title(info);
 		return title != null && //
 			title.toLowerCase().matches(".*" + desiredLower + ".*");
+	}
+
+	private boolean hasSubstringInMenu(final ModuleInfo info,
+	                                    final String desiredLower)
+	{
+		MenuPath menuPath = info.getMenuPath();
+		if(menuPath == null) return false;
+		return menuPath.stream().anyMatch(entry -> entry.getName().toLowerCase().contains(desiredLower));
 	}
 }

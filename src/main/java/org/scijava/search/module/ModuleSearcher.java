@@ -29,6 +29,7 @@
 
 package org.scijava.search.module;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -80,21 +81,32 @@ public class ModuleSearcher implements Searcher {
 			.collect(Collectors.toList());
 
 		final String textLower = text.toLowerCase();
+		final List<String> textLowerParts = Arrays.asList(textLower.split("\\s+"));
 
-		// First, add modules where title starts with the text.
+		// Add modules where title starts with the text.
 		modules.stream() //
 			.filter(info -> startsWith(info, textLower) ) //
 			.forEach(matches::add);
 
-		// Next, add modules where title has text inside somewhere.
+		// Add modules where title has text inside somewhere.
 		modules.stream() //
-			.filter(info -> hasSubstring(info, textLower)) //
+			.filter(info -> hasSubstringInTitle(info, textLower)) //
 			.forEach(matches::add);
 
-		// Finally, add modules where menu path has text inside somewhere.
+		// Add modules where menu path has text inside somewhere.
 		modules.stream() //
-			.filter(info -> hasSubstring(info, textLower)) //
+			.filter(info -> hasSubstringInMenu(info, textLower)) //
 			.forEach(matches::add);
+
+		// Add modules where title has all parts of the text inside somewhere.
+		modules.stream() //
+				.filter(info -> hasSubstringsInTitle(info, textLowerParts)) //
+				.forEach(matches::add);
+
+		// Add modules where menu path has all parts of the text inside somewhere.
+		modules.stream() //
+				.filter(info -> hasSubstringsInMenu(info, textLowerParts)) //
+				.forEach(matches::add);
 
 		// Wrap each matching ModuleInfo in a ModuleSearchResult.
 		return matches.stream() //
@@ -160,11 +172,35 @@ public class ModuleSearcher implements Searcher {
 		return title != null && title.toLowerCase().startsWith(desiredLower);
 	}
 
-	private boolean hasSubstring(final ModuleInfo info,
-		final String desiredLower)
+	private boolean hasSubstringInTitle(final ModuleInfo info,
+	                                    final String desiredLower)
 	{
 		final String title = title(info);
 		return title != null && //
 			title.toLowerCase().matches(".*" + desiredLower + ".*");
+	}
+
+	private boolean hasSubstringsInTitle(final ModuleInfo info,
+	                                    final List<String> desiredLower)
+	{
+		final String title = title(info);
+		if(title == null) return false;
+		return desiredLower.stream().allMatch(part -> title.toLowerCase().contains(part));
+	}
+
+	private boolean hasSubstringInMenu(final ModuleInfo info,
+	                                    final String desiredLower)
+	{
+		MenuPath menuPath = info.getMenuPath();
+		if(menuPath == null) return false;
+		return menuPath.stream().anyMatch(entry -> entry.getName().toLowerCase().contains(desiredLower));
+	}
+
+	private boolean hasSubstringsInMenu(final ModuleInfo info,
+	                                    final List<String> desiredLower)
+	{
+		MenuPath menuPath = info.getMenuPath();
+		if(menuPath == null) return false;
+		return desiredLower.stream().allMatch(part -> menuPath.stream().anyMatch(entry -> entry.getName().toLowerCase().contains(part)));
 	}
 }

@@ -49,19 +49,19 @@ import org.scijava.search.SearchResult;
 import org.scijava.search.Searcher;
 
 /**
- * A searcher for the <a href="http://forum.imagej.net/">ImageJ Forum</a>.
+ * A searcher for the <a href="https://forum.image.sc/">Image.sc Forum</a>.
  *
  * @author Robert Haase (MPI-CBG)
  */
 @Plugin(type = Searcher.class, enabled = false)
-public class ImageJForumSearcher implements Searcher {
+public class ImageForumSearcher implements Searcher {
 
 	@Parameter
 	private LogService log;
 
 	@Override
 	public String title() {
-		return "ImageJ Forum";
+		return "Image.sc Forum";
 	}
 
 	@Override
@@ -69,7 +69,7 @@ public class ImageJForumSearcher implements Searcher {
 		final ArrayList<SearchResult> searchResults = new ArrayList<>();
 
 		try {
-			final URL url = new URL("http://forum.imagej.net/search?q=" + //
+			final URL url = new URL("https://forum.image.sc/search?q=" + //
 				URLEncoder.encode(text, "utf-8") + "&source=imagej");
 			String webSearchContent;
 			try (final Scanner s = new Scanner(url.openStream())) {
@@ -87,7 +87,7 @@ public class ImageJForumSearcher implements Searcher {
 			for (final String result : results) {
 				final HashMap<String, String> metaInfo = parseForumSearchResult(result);
 
-				final String forumPostUrl = "http://forum.imagej.net/t/" + metaInfo.get(
+				final String forumPostUrl = "https://forum.image.sc/t/" + metaInfo.get(
 					"slug") + "/" + metaInfo.get("id") + "/";
 
 				final Map<String, String> extraProps = new LinkedHashMap<>();

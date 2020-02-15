@@ -10,7 +10,7 @@
 	</parent>
 
 	<artifactId>scijava-search</artifactId>
-	<version>0.7.0-SNAPSHOT</version>
+	<version>0.7.1-SNAPSHOT</version>
 
 	<name>SciJava Search</name>
 	<description>Search framework for SciJava applications.</description>

@@ -56,7 +56,7 @@ import org.xml.sax.SAXException;
  *
  * @author Robert Haase (MPI-CBG)
  */
-@Plugin(type = Searcher.class, priority = Priority.HIGH, enabled = false)
+//@Plugin(type = Searcher.class, priority = Priority.HIGH, enabled = false)
 public class ImageJWikiSearcher implements Searcher {
 
 	private final ArrayList<SearchResult> searchResults = new ArrayList<>();

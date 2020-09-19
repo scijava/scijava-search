@@ -53,7 +53,7 @@ import org.scijava.search.Searcher;
  *
  * @author Robert Haase (MPI-CBG)
  */
-@Plugin(type = Searcher.class, enabled = false)
+//@Plugin(type = Searcher.class, enabled = false)
 public class ImageForumSearcher implements Searcher {
 
 	@Parameter

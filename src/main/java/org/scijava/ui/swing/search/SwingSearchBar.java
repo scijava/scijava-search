@@ -45,7 +45,9 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
+import java.io.IOException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -53,6 +55,7 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -100,12 +103,13 @@ import org.scijava.thread.ThreadService;
  */
 public class SwingSearchBar extends JTextField {
 
+	public static final int ICON_SIZE = 16;
+
 	private static final String DEFAULT_MESSAGE = "Click here to search";
 	private static final Color ACTIVE_FONT_COLOR = new Color(0, 0, 0);
 	private static final Color INACTIVE_FONT_COLOR = new Color(150, 150, 150);
 	private static final Color SELECTED_RESULT_COLOR = new Color(186, 218, 255);
 	private static final String CONTEXT_COLOR = "#8C745E";
-	private static final int ICON_SIZE = 16;
 	private static final int PAD = 5;
 
 	private final DocumentListener documentListener;
@@ -683,6 +687,18 @@ public class SwingSearchBar extends JTextField {
 
 		private Component icon(final String iconPath) {
 			if (iconPath == null || iconPath.isEmpty()) return emptyIcon();
+			if (iconPath.startsWith("http")) {
+				try {
+					URL url = new URL(iconPath);
+					URLConnection connection = url.openConnection();
+					// NB: Hack to avoid HTTP 451 issues
+					connection.setRequestProperty("User-Agent", "Mozilla");
+					return new JLabel(new ImageIcon(ImageIO.read(connection.getInputStream())));
+				}
+				catch (IOException exc) {
+					return emptyIcon();
+				}
+			}
 			final URL iconURL = getClass().getResource(iconPath);
 			if (iconURL == null) return emptyIcon();
 			final ImageIcon icon = new ImageIcon(iconURL);

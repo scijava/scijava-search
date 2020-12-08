@@ -92,11 +92,13 @@ public class ImageScSearcher implements Searcher {
 		String title = topics.get(get(post, "topic_id"));
 		String displayName = get(post, "name");
 		displayName += displayName.isEmpty() ? get(post, "username") : " (" + get(post, "username") + ")";
+		String iconPath = get(post, "avatar_template").replace("{size}", "" + SwingSearchBar.ICON_SIZE);
+		if (!iconPath.startsWith("https://")) iconPath = FORUM_AVATAR_PREFIX + iconPath;
 		Map<String, String> extraProps = new LinkedHashMap<>();
 		extraProps.put("Created", formatDate(get(post, "created_at")) + " by " + displayName);
 		extraProps.put("Tags", tags.get(get(post, "topic_id")));
 		extraProps.put("Likes", "\u2665 " + get(post, "like_count"));
-		return new WebSearchResult(title, String.join("/", POST_URL_PREFIX, get(post, "topic_id"), get(post, "post_number")), get(post, "blurb"), null, extraProps);
+		return new WebSearchResult(title, String.join("/", POST_URL_PREFIX, get(post, "topic_id"), get(post, "post_number")), get(post, "blurb"), iconPath, extraProps);
 	}
 
 	private String get(JsonObject post, String key) {

@@ -1,0 +1,113 @@
+package org.scijava.search.web;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonStreamParser;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
+
+import org.ocpsoft.prettytime.PrettyTime;
+import org.scijava.log.LogService;
+import org.scijava.plugin.Parameter;
+import org.scijava.plugin.Plugin;
+import org.scijava.search.SearchResult;
+import org.scijava.search.Searcher;
+import org.scijava.ui.swing.search.SwingSearchBar;
+
+@Plugin(type = Searcher.class, enabled = false)
+public class ImageScSearcher implements Searcher {
+
+	private static String URL_PREFIX = "https://forum.image.sc/search/query.json?term=";
+	private static String POST_URL_PREFIX = "https://forum.image.sc/t";
+	private static String FORUM_AVATAR_PREFIX = "https://forum.image.sc";
+	private static String TERM_SUFFIX = " tags:imagej";
+
+	@Parameter
+	private LogService logService;
+
+	@Override
+	public String title() {
+		return "Image.sc Forum";
+	}
+
+	@Override
+	public List<SearchResult> search(String text, boolean fuzzy) {
+
+		final List<SearchResult> searchResults = new ArrayList<>();
+
+		try {
+			final URL url = new URL(URL_PREFIX + URLEncoder.encode(text + TERM_SUFFIX, "utf-8"));
+			InputStream is = url.openStream();
+			try (InputStreamReader sr = new InputStreamReader(is, "UTF-8");
+					BufferedReader reader = new BufferedReader(sr))
+			{
+				Map<String, String> topicTitleMap = new HashMap<>();
+				Map<String, String> topicTagMap = new HashMap<>();
+				JsonObject info = new JsonStreamParser(reader).next().getAsJsonObject();
+				JsonArray topics = info.get("topics").getAsJsonArray();
+				topics.forEach(t -> appendTopicMaps(t.getAsJsonObject(), topicTitleMap, topicTagMap));
+				// TODO get posts and topics
+				JsonArray posts = info.get("posts").getAsJsonArray();
+				posts.forEach(p -> searchResults.add(createResult(p.getAsJsonObject(), topicTitleMap, topicTagMap)));
+			}
+		}
+		catch (MalformedURLException exc) {
+			logService.warn(exc);
+		}
+		catch (UnsupportedEncodingException exc) {
+			logService.warn(exc);
+		}
+		catch (IOException exc) {
+			logService.warn(exc);
+		}
+
+		return searchResults;
+	}
+
+	private void appendTopicMaps(JsonObject t,
+		Map<String, String> topicTitleMap, Map<String, String> topicTagMap)
+	{
+		topicTitleMap.put(get(t, "id"), get(t, "title"));
+		topicTagMap.put(get(t, "id"), String.join(", ", StreamSupport.stream(t.get("tags").getAsJsonArray().spliterator(), false).map(j -> j.getAsString()).collect(Collectors.toList())));
+	}
+
+	private SearchResult createResult(JsonObject post, Map<String, String> topics, Map<String, String> tags) {
+		String title = topics.get(get(post, "topic_id"));
+		String displayName = get(post, "name");
+		displayName += displayName.isEmpty() ? get(post, "username") : " (" + get(post, "username") + ")";
+		String iconPath = get(post, "avatar_template").replace("{size}", "" + SwingSearchBar.ICON_SIZE);
+		if (!iconPath.startsWith("https://")) iconPath = FORUM_AVATAR_PREFIX + iconPath;
+		Map<String, String> extraProps = new LinkedHashMap<>();
+		extraProps.put("Created", formatDate(get(post, "created_at")) + " by " + displayName);
+		extraProps.put("Tags", tags.get(get(post, "topic_id")));
+		extraProps.put("Likes", "\u2665 " + get(post, "like_count"));
+		return new WebSearchResult(title, String.join("/", POST_URL_PREFIX, get(post, "topic_id"), get(post, "post_number")), get(post, "blurb"), iconPath, extraProps);
+	}
+
+	private String get(JsonObject post, String key) {
+		return post.get(key).getAsString();
+	}
+
+	private String formatDate(final String datestr) {
+		final Instant instant = Instant.parse(datestr);
+		return new PrettyTime().format(Date.from(instant));
+	}
+
+}

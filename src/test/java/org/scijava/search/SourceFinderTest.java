@@ -47,7 +47,7 @@ public class SourceFinderTest {
 
 	@Before
 	public void setUp() {
-		context = new Context();
+		context = new Context(LogService.class);
 		logService = context.service(LogService.class);
 	}
 

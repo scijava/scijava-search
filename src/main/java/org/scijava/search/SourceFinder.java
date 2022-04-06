@@ -96,7 +96,8 @@ public final class SourceFinder {
 			if (!scmURL.endsWith("/")) url.append("/");
 			url.append("blob/");
 			url.append(tag);
-			url.append("/src/main/java/");
+			final String sourceDir = pom.cdata("//build/sourceDirectory");
+			url.append(sourceDir == null ? "/src/main/java/" : sourceDir.replace("${project.basedir}", "") + "/");
 			url.append(c.getName().replaceAll("\\.", "/"));
 			url.append(".java");
 			return new URL(url.toString());

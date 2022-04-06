@@ -55,6 +55,11 @@
 			<properties><id>haesleinhuepf</id></properties>
 			<roles><role>founder</role></roles>
 		</contributor>
+		<contributor>
+			<name>Jan Eglinger</name>
+			<url>https://imagej.net/people/imagejan</url>
+			<properties><id>imagejan</id></properties>
+		</contributor>
 	</contributors>
 
 	<mailingLists>
@@ -91,6 +96,9 @@
 		<releaseProfiles>sign,deploy-to-scijava</releaseProfiles>
 
 		<prettytime.version>4.0.1.Final</prettytime.version>
+
+		<!-- NB: Pin imagej1 version for test -->
+		<imagej1.version>1.53q</imagej1.version>
 	</properties>
 
 	<repositories>
@@ -120,6 +128,13 @@
 			<groupId>org.ocpsoft.prettytime</groupId>
 			<artifactId>prettytime</artifactId>
 			<version>${prettytime.version}</version>
+		</dependency>
+
+		<!-- Test dependencies -->
+		<dependency>
+			<groupId>net.imagej</groupId>
+			<artifactId>ij</artifactId>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>

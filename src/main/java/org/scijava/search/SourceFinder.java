@@ -29,20 +29,12 @@
 
 package org.scijava.search;
 
-import java.io.File;
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.scijava.log.Logger;
-import org.scijava.util.AppUtils;
-import org.scijava.util.FileUtils;
 import org.scijava.util.Manifest;
 import org.scijava.util.POM;
-import org.scijava.util.Types;
-import org.xml.sax.SAXException;
 
 /**
  * Static utility class for finding source URL of a given class.
@@ -63,7 +55,7 @@ public final class SourceFinder {
 		throws SourceNotFoundException
 	{
 		try {
-			final POM pom = getPOM(c, null, null);
+			final POM pom = POM.getPOM(c);
 			if (pom == null) {
 				log.debug("No Maven POM found for class: " + c.getName());
 				throw new SourceNotFoundException(c, null);
@@ -104,7 +96,8 @@ public final class SourceFinder {
 			if (!scmURL.endsWith("/")) url.append("/");
 			url.append("blob/");
 			url.append(tag);
-			url.append("/src/main/java/");
+			final String sourceDir = pom.cdata("//build/sourceDirectory");
+			url.append(sourceDir == null ? "/src/main/java/" : sourceDir.replace("${project.basedir}", "") + "/");
 			url.append(c.getName().replaceAll("\\.", "/"));
 			url.append(".java");
 			return new URL(url.toString());
@@ -124,51 +117,4 @@ public final class SourceFinder {
 		return g + ":" + a + ":" + v;
 	}
 
-	// TODO: Use org.scijava.util.POM.getPOM from scijava-common 2.77.0.
-
-	/**
-	 * Gets the Maven POM associated with the given class.
-	 * 
-	 * @param c The class to use as a base when searching for a pom.xml.
-	 * @param groupId The Maven groupId of the desired POM.
-	 * @param artifactId The Maven artifactId of the desired POM.
-	 */
-	private static POM getPOM(final Class<?> c, final String groupId,
-		final String artifactId)
-	{
-		try {
-			final URL location = Types.location(c);
-			if (!location.getProtocol().equals("file") ||
-				location.toString().endsWith(".jar"))
-			{
-				// look for pom.xml in JAR's META-INF/maven subdirectory
-				if (groupId == null || artifactId == null) {
-					// groupId and/or artifactId is unknown; scan for the POM
-					final URL pomBase = new URL("jar:" + //
-						location.toString() + "!/META-INF/maven");
-					for (final URL url : FileUtils.listContents(pomBase, true, true)) {
-						if (url.toExternalForm().endsWith("/pom.xml")) {
-							return new POM(url);
-						}
-					}
-				}
-				else {
-					// known groupId and artifactId; grab it directly
-					final String pomPath =
-						"META-INF/maven/" + groupId + "/" + artifactId + "/pom.xml";
-					final URL pomURL =
-						new URL("jar:" + location.toString() + "!/" + pomPath);
-					return new POM(pomURL);
-				}
-			}
-			// look for the POM in the class's base directory
-			final File file = FileUtils.urlToFile(location);
-			final File baseDir = AppUtils.getBaseDirectory(file, null);
-			final File pomFile = new File(baseDir, "pom.xml");
-			return new POM(pomFile);
-		}
-		catch (final IOException | ParserConfigurationException | SAXException e) {
-			return null;
-		}
-	}
 }

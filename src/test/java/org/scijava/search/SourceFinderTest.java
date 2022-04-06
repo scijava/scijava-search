@@ -29,6 +29,7 @@
 package org.scijava.search;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.net.URL;
 
@@ -56,8 +57,30 @@ public class SourceFinderTest {
 		context.dispose();
 	}
 
+	/**
+	 * Tests {@link SourceFinder#sourceLocation(Class, LogService)} when the
+	 * project uses the default {@code <sourceDirectory>}.
+	 */
 	@Test
-	public void testSourceLocation() throws SourceNotFoundException {
+	public void testSourceLocationDefaultSourceDirectory()
+		throws SourceNotFoundException
+	{
+		URL url = SourceFinder.sourceLocation(Context.class, logService);
+		String expected = "^/scijava/scijava-common/blob/scijava-common-[0-9\\.]+" +
+			"/src/main/java/org/scijava/Context\\.java$";
+		String actual = url.getPath();
+		assertTrue("Unexpected path: " + actual, actual.matches(expected));
+	}
+
+	/**
+	 * Tests {@link SourceFinder#sourceLocation(Class, LogService)} when the
+	 * project has overridden the {@code <sourceDirectory>} property in its
+	 * project POM.
+	 */
+	@Test
+	public void testSourceLocationOverriddenSourceDirectory()
+		throws SourceNotFoundException
+	{
 		URL url = SourceFinder.sourceLocation(IJ.class, logService);
 		// NB: we expect the version as pinned in pom.xml
 		String expected = "/imagej/ImageJ/blob/v1.53q/ij/IJ.java";

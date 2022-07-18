@@ -27,7 +27,7 @@
  * #L%
  */
 
-package org.scijava.search.classes;
+package org.scijava.search.javadoc;
 
 import java.io.IOException;
 import java.net.URL;
@@ -41,6 +41,7 @@ import org.scijava.search.DefaultSearchAction;
 import org.scijava.search.SearchAction;
 import org.scijava.search.SearchActionFactory;
 import org.scijava.search.SearchResult;
+import org.scijava.search.classes.ClassSearchResult;
 import org.scijava.search.javadoc.JavadocService;
 import org.scijava.ui.DialogPrompt.MessageType;
 import org.scijava.ui.UIService;

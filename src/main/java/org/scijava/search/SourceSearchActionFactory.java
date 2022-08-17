@@ -29,19 +29,14 @@
 
 package org.scijava.search;
 
+import java.io.IOException;
+import java.net.URL;
+
 import org.scijava.log.LogService;
 import org.scijava.platform.PlatformService;
 import org.scijava.plugin.Parameter;
-import org.scijava.search.DefaultSearchAction;
-import org.scijava.search.SearchAction;
-import org.scijava.search.SearchActionFactory;
-import org.scijava.search.SearchResult;
-import org.scijava.search.SourceFinder;
-import org.scijava.search.SourceNotFoundException;
 import org.scijava.ui.UIService;
 
-import java.io.IOException;
-import java.net.URL;
 
 /**
  * Search action for viewing the source code of a SciJava module.

@@ -43,6 +43,11 @@ import org.scijava.ui.UIService;
 import java.io.IOException;
 import java.net.URL;
 
+/**
+ * Search action for viewing the source code of a SciJava module.
+ *
+ * @author Curtis Rueden
+ */
 public abstract class SourceSearchActionFactory implements SearchActionFactory {
 
 	@Parameter

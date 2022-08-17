@@ -54,7 +54,7 @@ public abstract class SourceSearchActionFactory implements SearchActionFactory {
 	@Parameter
 	private PlatformService platformService;
 
-	public abstract Class<?> classFromSearchResult(final SearchResult result);
+	protected abstract Class<?> classFromSearchResult(final SearchResult result);
 
 	@Override
 	public SearchAction create(final SearchResult result) {

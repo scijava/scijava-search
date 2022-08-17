@@ -48,7 +48,7 @@ public class ClassSourceSearchActionFactory extends SourceSearchActionFactory {
 	}
 
 	@Override
-	public Class<?> classFromSearchResult(SearchResult result) {
+	protected Class<?> classFromSearchResult(SearchResult result) {
 		return ((ClassSearchResult) result).clazz();
 	}
 }

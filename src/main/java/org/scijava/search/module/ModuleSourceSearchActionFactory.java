@@ -58,7 +58,7 @@ public class ModuleSourceSearchActionFactory extends SourceSearchActionFactory {
 	}
 
 	@Override
-	public Class<?> classFromSearchResult(SearchResult result) {
+	protected Class<?> classFromSearchResult(SearchResult result) {
 		try {
 			ModuleInfo info = ((ModuleSearchResult) result).info();
 			return info.loadDelegateClass();

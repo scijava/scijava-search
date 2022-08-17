@@ -113,7 +113,7 @@ public class HelpSearchActionTest {
 		action.run();
 		assertEquals(1, mockService.getOpenedURLs().size());
 		assertEquals(
-			"https://imagej.net/command_org_scijava_search_module_TestCommand",
+			"https://scijava.org/",
 			mockService.getOpenedURLs().get(0));
 
 	}

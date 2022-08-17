@@ -38,6 +38,7 @@ import org.scijava.search.DefaultSearchAction;
 import org.scijava.search.SearchAction;
 import org.scijava.search.SearchActionFactory;
 import org.scijava.search.SearchResult;
+import org.scijava.util.POM;
 
 import java.io.IOException;
 import java.net.URL;
@@ -68,18 +69,18 @@ public class HelpSearchActionFactory implements SearchActionFactory {
 	}
 
 	private void help(final ModuleSearchResult result) {
-		// HACK: For now, convert the module title into a wiki URL.
-		// In future, we need to add a url field to @Plugin for
-		// embedding the URL associated with that specific plugin.
-		final ModuleInfo info = result.info();
-		final String title = info.getTitle();
-		final String url = "https://imagej.net/" + //
-			title.replaceAll("[^a-zA-Z0-9_-]", "_");
 		try {
+			// HACK: For now, use the POM's URL
+			// In future, we need to add a url field to @Plugin for
+			// embedding the URL associated with that specific plugin.
+			final ModuleInfo info = result.info();
+			final String url = POM.getPOM(info.loadDelegateClass())
+				.getOrganizationURL();
 			platformService.open(new URL(url));
 		}
-		catch (final IOException exc) {
+		catch (final IOException | ClassNotFoundException exc) {
 			log.error(exc);
 		}
 	}
+
 }

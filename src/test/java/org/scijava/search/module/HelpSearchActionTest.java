@@ -112,10 +112,8 @@ public class HelpSearchActionTest {
 		final SearchAction action = factory.create(result);
 		action.run();
 		assertEquals(1, mockService.getOpenedURLs().size());
-		assertEquals(
-			"https://scijava.org/",
-			mockService.getOpenedURLs().get(0));
-
+		assertEquals("https://github.com/scijava/scijava-search", mockService
+			.getOpenedURLs().get(0));
 	}
 
 	private SearchResult createTestResult() {

@@ -75,7 +75,7 @@ public class HelpSearchActionFactory implements SearchActionFactory {
 			// embedding the URL associated with that specific plugin.
 			final ModuleInfo info = result.info();
 			final String url = POM.getPOM(info.loadDelegateClass())
-				.getOrganizationURL();
+				.getProjectURL();
 			platformService.open(new URL(url));
 		}
 		catch (final IOException | ClassNotFoundException exc) {

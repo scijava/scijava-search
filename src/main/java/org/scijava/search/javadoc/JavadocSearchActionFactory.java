@@ -27,11 +27,12 @@
  * #L%
  */
 
-package org.scijava.search.classes;
+package org.scijava.search.javadoc;
 
 import java.io.IOException;
 import java.net.URL;
 
+import org.scijava.Priority;
 import org.scijava.log.LogService;
 import org.scijava.platform.PlatformService;
 import org.scijava.plugin.Parameter;
@@ -40,17 +41,18 @@ import org.scijava.search.DefaultSearchAction;
 import org.scijava.search.SearchAction;
 import org.scijava.search.SearchActionFactory;
 import org.scijava.search.SearchResult;
-import org.scijava.search.SourceFinder;
-import org.scijava.search.SourceNotFoundException;
+import org.scijava.search.classes.ClassSearchResult;
+import org.scijava.search.javadoc.JavadocService;
+import org.scijava.ui.DialogPrompt.MessageType;
 import org.scijava.ui.UIService;
 
 /**
- * Search action for viewing the source code of a Java class.
+ * Search action for viewing the javadoc of a Java class.
  *
  * @author Curtis Rueden
  */
-@Plugin(type = SearchActionFactory.class)
-public class SourceSearchActionFactory implements SearchActionFactory {
+@Plugin(type = SearchActionFactory.class, priority = Priority.LOW)
+public class JavadocSearchActionFactory implements SearchActionFactory {
 
 	@Parameter
 	private LogService log;
@@ -61,6 +63,9 @@ public class SourceSearchActionFactory implements SearchActionFactory {
 	@Parameter
 	private PlatformService platformService;
 
+	@Parameter
+	private JavadocService javadocService;
+
 	@Override
 	public boolean supports(final SearchResult result) {
 		return result instanceof ClassSearchResult;
@@ -68,29 +73,28 @@ public class SourceSearchActionFactory implements SearchActionFactory {
 
 	@Override
 	public SearchAction create(final SearchResult result) {
-		return new DefaultSearchAction("Source", //
-			() -> source(((ClassSearchResult) result).clazz()));
+		return new DefaultSearchAction("Javadoc", () -> javadoc(result));
 	}
 
-	private void source(final Class<?> c) {
-		URL sourceLocation = null;
-		try {
-			sourceLocation = SourceFinder.sourceLocation(c, log);
-		}
-		catch (final SourceNotFoundException exc) {
-			log.error(exc);
-		}
-		if (sourceLocation == null) {
-			uiService.showDialog("Source location unknown for " + c.getName());
+	private void javadoc(final SearchResult result) {
+		final String javadocURL = javadocURL(result);
+		if (javadocURL == null) {
+			uiService.showDialog("Could not discern javadoc URL for class: " +
+				((ClassSearchResult) result).clazz(), "Javadoc Search",
+				MessageType.ERROR_MESSAGE);
 			return;
 		}
 		try {
-			platformService.open(sourceLocation);
+			platformService.open(new URL(javadocURL));
 		}
 		catch (final IOException exc) {
 			log.error(exc);
-			uiService.showDialog("Platform error opening source URL: " +
-				sourceLocation);
+			uiService.showDialog("Error opening javadoc URL: " + javadocURL,
+				"Javadoc Search", MessageType.ERROR_MESSAGE);
 		}
+	}
+
+	private String javadocURL(final SearchResult result) {
+		return javadocService.url(((ClassSearchResult) result).clazz());
 	}
 }

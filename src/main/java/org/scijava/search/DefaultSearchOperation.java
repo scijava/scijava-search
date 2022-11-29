@@ -37,6 +37,8 @@ import java.util.Optional;
 import java.util.regex.PatternSyntaxException;
 
 import org.scijava.Context;
+import org.scijava.event.ContextDisposingEvent;
+import org.scijava.event.EventHandler;
 import org.scijava.log.LogService;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.PluginService;
@@ -121,6 +123,11 @@ public class DefaultSearchOperation implements SearchOperation {
 	@Override
 	public void terminate() {
 		active = false;
+	}
+
+	@EventHandler
+	public void onEvent(@SuppressWarnings("unused") final ContextDisposingEvent evt) {
+		terminate();
 	}
 
 	// -- Helper methods --

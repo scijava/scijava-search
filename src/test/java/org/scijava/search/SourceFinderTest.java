@@ -83,7 +83,7 @@ public class SourceFinderTest {
 	{
 		URL url = SourceFinder.sourceLocation(IJ.class, logService);
 		// NB: we expect the version as pinned in pom.xml
-		String expected = "/imagej/ImageJ/blob/v1.53q/ij/IJ.java";
+		String expected = "/imagej/ImageJ/blob/v1.54b/ij/IJ.java";
 		assertEquals(expected, url.getPath());
 	}
 }

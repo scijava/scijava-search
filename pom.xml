@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.scijava</groupId>
 		<artifactId>pom-scijava</artifactId>
-		<version>31.1.0</version>
+		<version>33.2.0</version>
 		<relativePath />
 	</parent>
 
@@ -98,7 +98,7 @@
 		<prettytime.version>4.0.1.Final</prettytime.version>
 
 		<!-- NB: Pin imagej1 version for test -->
-		<imagej1.version>1.53q</imagej1.version>
+		<imagej1.version>1.54b</imagej1.version>
 	</properties>
 
 	<repositories>

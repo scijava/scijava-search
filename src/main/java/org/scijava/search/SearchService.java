@@ -29,7 +29,9 @@
 
 package org.scijava.search;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.scijava.plugin.SingletonService;
@@ -65,9 +67,13 @@ public interface SearchService extends SingletonService<SearchActionFactory>,
 	 * @return A list of actions which could possibly be executed for the result.
 	 */
 	default List<SearchAction> actions(final SearchResult result) {
+		// Create a map used to track whether a name has been seen
+		final Map<Object, Boolean> seenLabels = new HashMap<>();
 		return getInstances().stream() //
 			.filter(factory -> factory.supports(result)) //
 			.map(factory -> factory.create(result)) //
+			// NB The following line skip actions with duplicate labels
+			.filter(t -> seenLabels.putIfAbsent(t.toString(), Boolean.TRUE) == null) //
 			.collect(Collectors.toList());
 	}
 

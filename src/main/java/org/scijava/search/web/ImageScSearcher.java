@@ -29,15 +29,16 @@
 package org.scijava.search.web;
 
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonStreamParser;
 
 import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -62,7 +63,7 @@ import org.scijava.ui.swing.search.SwingSearchBar;
 @Plugin(type = Searcher.class, enabled = false)
 public class ImageScSearcher implements Searcher {
 
-	private static String URL_PREFIX = "https://forum.image.sc/search/query.json?term=";
+	private static String URL_PREFIX = "https://forum.image.sc/search.json?q=";
 	private static String POST_URL_PREFIX = "https://forum.image.sc/t";
 	private static String FORUM_AVATAR_PREFIX = "https://forum.image.sc";
 	private static String TERM_SUFFIX = " tags:imagej";
@@ -82,7 +83,15 @@ public class ImageScSearcher implements Searcher {
 
 		try {
 			final URL url = new URL(URL_PREFIX + URLEncoder.encode(text + TERM_SUFFIX, "utf-8"));
-			InputStream is = url.openStream();
+
+			// Pass the API key as a header parameter.
+			HttpURLConnection con = (HttpURLConnection) url.openConnection();
+			con.setRequestMethod("GET");
+			con.setRequestProperty("Api-Username", "imagesc-bot");
+			con.setRequestProperty("Api-Key", "b1a28dbb29c385e06026482661c8de55dd01972ff993bea6547783e52e8a017d");
+
+			// Connect and read the result.
+			InputStream is = con.getInputStream();
 			try (InputStreamReader sr = new InputStreamReader(is, "UTF-8");
 					BufferedReader reader = new BufferedReader(sr))
 			{
@@ -138,4 +147,21 @@ public class ImageScSearcher implements Searcher {
 		return new PrettyTime().format(Date.from(instant));
 	}
 
+	// Credit: https://www.baeldung.com/java-http-request
+	public static String getParamsString(final Map<String, String> params)
+		throws UnsupportedEncodingException
+	{
+		StringBuilder result = new StringBuilder();
+
+		for (Map.Entry<String, String> entry : params.entrySet()) {
+			result.append(URLEncoder.encode(entry.getKey(), "UTF-8"));
+			result.append("=");
+			result.append(URLEncoder.encode(entry.getValue(), "UTF-8"));
+			result.append("&");
+		}
+
+		String resultString = result.toString();
+		return resultString.length() > 0 ? //
+			resultString.substring(0, resultString.length() - 1) : resultString;
+	}
 }

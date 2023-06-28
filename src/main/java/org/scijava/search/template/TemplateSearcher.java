@@ -30,6 +30,7 @@ package org.scijava.search.template;
 
 import java.io.File;
 import java.net.URL;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -56,6 +57,9 @@ public class TemplateSearcher implements Searcher {
 
 	@Override
 	public List<SearchResult> search(String text, boolean fuzzy) {
+		// Sanity check - ensure nonempty text
+		if(text.isEmpty())
+			return Collections.emptyList();
 		// Get list of all templates in possible template paths
 		// templateService.getTemplates() ??
 		final String templatePath = "script_templates";

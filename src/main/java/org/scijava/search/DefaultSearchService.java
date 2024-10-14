@@ -2,7 +2,7 @@
  * #%L
  * Search framework for SciJava applications.
  * %%
- * Copyright (C) 2017 - 2023 SciJava developers.
+ * Copyright (C) 2017 - 2024 SciJava developers.
  * %%
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:

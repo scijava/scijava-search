@@ -104,7 +104,7 @@ import org.scijava.thread.ThreadService;
  */
 public class SwingSearchBar extends JTextField {
 
-	public static final int ICON_SIZE = 16;
+	public static final int ICON_SIZE = 32;
 
 	private static final String DEFAULT_MESSAGE = "Click here to search";
 	private static final Color ACTIVE_FONT_COLOR = new Color(0, 0, 0);

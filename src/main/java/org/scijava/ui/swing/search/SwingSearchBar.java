@@ -36,6 +36,7 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
+import java.awt.Image;
 import java.awt.Window;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
@@ -701,11 +702,13 @@ public class SwingSearchBar extends JTextField {
 			}
 			final URL iconURL = getClass().getResource(iconPath);
 			if (iconURL == null) return emptyIcon();
-			final ImageIcon icon = new ImageIcon(iconURL);
+			ImageIcon icon = new ImageIcon(iconURL);
 			if (icon.getIconWidth() != ICON_SIZE || //
 				icon.getIconHeight() != ICON_SIZE)
 			{
-				return emptyIcon();
+				// Resize icon to the needed size.
+				icon = new ImageIcon(icon.getImage().getScaledInstance(
+					ICON_SIZE, ICON_SIZE, Image.SCALE_SMOOTH));
 			}
 			return new JLabel(icon);
 		}

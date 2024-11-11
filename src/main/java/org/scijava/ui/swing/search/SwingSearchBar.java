@@ -174,9 +174,7 @@ public class SwingSearchBar extends JTextField {
 
 			@Override
 			public void focusLost(final FocusEvent e) {
-				if (getText().equals("")) {
-					reset();
-				}
+				if (getText().isEmpty()) reset();
 			}
 		});
 
@@ -834,7 +832,7 @@ public class SwingSearchBar extends JTextField {
 	}
 
 	/** A header dividing search result entries. */
-	private class SearchResultHeader implements SearchResult {
+	private static class SearchResultHeader implements SearchResult {
 
 		private final Searcher searcher;
 		private final int resultCount;

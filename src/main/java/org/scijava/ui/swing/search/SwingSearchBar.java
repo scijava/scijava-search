@@ -104,8 +104,6 @@ import org.scijava.thread.ThreadService;
  */
 public class SwingSearchBar extends JTextField {
 
-	public static final int ICON_SIZE = 32;
-
 	private static final String DEFAULT_MESSAGE = "Click here to search";
 	private static final Color ACTIVE_FONT_COLOR = new Color(0, 0, 0);
 	private static final Color INACTIVE_FONT_COLOR = new Color(150, 150, 150);
@@ -130,6 +128,9 @@ public class SwingSearchBar extends JTextField {
 
 	/** The maximum number of results per search category. */
 	private int resultLimit = 8;
+
+	/** The size of the search result icons (both width and height). */
+	private int iconSize = 16;
 
 	/** Whether the selection should change upon mouseover. */
 	private boolean mouseoverEnabled;
@@ -205,6 +206,12 @@ public class SwingSearchBar extends JTextField {
 	public void setResultLimit(final int resultLimit) {
 		if (resultLimit <= 0) return; // Ignore invalid limit.
 		this.resultLimit = resultLimit;
+	}
+
+	/** Sets the size (both width and height) of the search result icons. */
+	public void setIconSize(final int iconSize) {
+		if (iconSize < 0) return; // Ignore invalid limit.
+		this.iconSize = iconSize;
 	}
 
 	/** Gets whether the selection should change upon mouseover. */
@@ -685,7 +692,7 @@ public class SwingSearchBar extends JTextField {
 		}
 
 		private Component icon(final String iconPath) {
-			if (iconPath == null || iconPath.isEmpty()) return emptyIcon();
+			if (iconSize == 0 || iconPath == null || iconPath.isEmpty()) return emptyIcon();
 			if (iconPath.startsWith("http")) {
 				try {
 					URL url = new URL(iconPath);
@@ -701,18 +708,18 @@ public class SwingSearchBar extends JTextField {
 			final URL iconURL = getClass().getResource(iconPath);
 			if (iconURL == null) return emptyIcon();
 			ImageIcon icon = new ImageIcon(iconURL);
-			if (icon.getIconWidth() != ICON_SIZE || //
-				icon.getIconHeight() != ICON_SIZE)
+			if (icon.getIconWidth() != iconSize || //
+				icon.getIconHeight() != iconSize)
 			{
 				// Resize icon to the needed size.
 				icon = new ImageIcon(icon.getImage().getScaledInstance(
-					ICON_SIZE, ICON_SIZE, Image.SCALE_SMOOTH));
+					iconSize, iconSize, Image.SCALE_SMOOTH));
 			}
 			return new JLabel(icon);
 		}
 
 		private Component emptyIcon() {
-			return Box.createRigidArea(new Dimension(ICON_SIZE, ICON_SIZE));
+			return Box.createRigidArea(new Dimension(iconSize, iconSize));
 		}
 
 		private boolean isHeader(final SearchResult value) {

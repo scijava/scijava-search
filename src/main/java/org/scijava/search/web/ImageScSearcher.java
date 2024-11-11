@@ -58,7 +58,6 @@ import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 import org.scijava.search.SearchResult;
 import org.scijava.search.Searcher;
-import org.scijava.ui.swing.search.SwingSearchBar;
 
 @Plugin(type = Searcher.class, enabled = false)
 public class ImageScSearcher implements Searcher {
@@ -129,8 +128,7 @@ public class ImageScSearcher implements Searcher {
 		String title = topics.get(get(post, "topic_id"));
 		String displayName = get(post, "name");
 		displayName += displayName.isEmpty() ? get(post, "username") : " (" + get(post, "username") + ")";
-		String iconPath = get(post, "avatar_template").replace("{size}", "" + SwingSearchBar.ICON_SIZE);
-		if (!iconPath.startsWith("https://")) iconPath = FORUM_AVATAR_PREFIX + iconPath;
+		String iconPath = null;
 		Map<String, String> extraProps = new LinkedHashMap<>();
 		extraProps.put("Created", formatDate(get(post, "created_at")) + " by " + displayName);
 		extraProps.put("Tags", tags.get(get(post, "topic_id")));

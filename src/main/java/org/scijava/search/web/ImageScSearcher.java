@@ -121,7 +121,7 @@ public class ImageScSearcher implements Searcher {
 		Map<String, String> topicTitleMap, Map<String, String> topicTagMap)
 	{
 		topicTitleMap.put(get(t, "id"), get(t, "title"));
-		topicTagMap.put(get(t, "id"), String.join(", ", StreamSupport.stream(t.get("tags").getAsJsonArray().spliterator(), false).map(j -> j.getAsString()).collect(Collectors.toList())));
+		topicTagMap.put(get(t, "id"), String.join(", ", StreamSupport.stream(t.get("tags").getAsJsonArray().spliterator(), false).map(j -> j.isJsonObject() ? j.getAsJsonObject().get("name").getAsString() : j.getAsString()).collect(Collectors.toList())));
 	}
 
 	private SearchResult createResult(JsonObject post, Map<String, String> topics, Map<String, String> tags) {

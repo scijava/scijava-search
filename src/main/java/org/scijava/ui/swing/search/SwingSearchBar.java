@@ -105,7 +105,13 @@ import org.scijava.thread.ThreadService;
 public class SwingSearchBar extends JTextField {
 
 	private static final String DEFAULT_MESSAGE = "Click here to search";
-	private static final Color ACTIVE_FONT_COLOR = new Color(0, 0, 0);
+	private static final Color DEFAULT_ACTIVE_FONT_COLOR = new Color(0, 0, 0);
+	/** Text color while typing; follows the look and feel (e.g., dark themes). */
+	private static Color activeFontColor() {
+		final Color c = UIManager.getColor("TextField.foreground");
+		return c == null ? DEFAULT_ACTIVE_FONT_COLOR : c;
+	}
+
 	private static final Color INACTIVE_FONT_COLOR = new Color(150, 150, 150);
 	private static final Color SELECTED_RESULT_COLOR = new Color(186, 218, 255);
 	private static final String CONTEXT_COLOR = "#8C745E";
@@ -170,7 +176,7 @@ public class SwingSearchBar extends JTextField {
 			@Override
 			public void focusGained(final FocusEvent e) {
 				if (DEFAULT_MESSAGE.equals(getText())) setText("");
-				setForeground(ACTIVE_FONT_COLOR);
+				setForeground(activeFontColor());
 			}
 
 			@Override

@@ -95,6 +95,9 @@
 		<license.copyrightOwners>SciJava developers.</license.copyrightOwners>
 
 		<prettytime.version>4.0.1.Final</prettytime.version>
+
+		<!-- NB: Deploy releases to the SciJava Maven repository. -->
+		<releaseProfiles>sign,deploy-to-scijava</releaseProfiles>
 	</properties>
 
 	<repositories>
